@@ -1,6 +1,6 @@
 = simple_drilldown
 
-Description goes here.
+An analysis framework for active record.
 
 == Contributing to simple_drilldown
  

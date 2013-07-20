@@ -13,12 +13,12 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "simple_drilldown"
-  gem.homepage = "http://github.com/donv/simple_drilldown"
+  gem.homepage = "http://github.com/datekwireless/simple_drilldown"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
-  gem.email = "uwe@kubosch.no"
-  gem.authors = ["donv"]
+  gem.summary = %Q{tool to make simple data warehouse analysis}
+  gem.description = %Q{tool to make simple data warehouse analysis}
+  gem.email = "uwe@datek.no"
+  gem.authors = ["uweædatek.no"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
   # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
   #  gem.add_runtime_dependency 'jabber4r', '> 0.1'
