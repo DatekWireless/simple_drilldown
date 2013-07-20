@@ -1,7 +1,3 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
-group :development do
-  gem 'shoulda'
-  gem 'bundler'
-  gem 'rcov'
-end
+gemspec
