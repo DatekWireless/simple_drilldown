@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = %w(uwe@kubosch.no)
   spec.summary       = %q{Simple data warehouse and drilldown.}
   spec.description   = %q{simple_drilldown offers a simple way to define axis to filter and group records for analysis.}
-  spec.homepage      = 'http://github.com/donv/simple_drilldown'
+  spec.homepage      = 'http://github.com/datekwireless/simple_drilldown'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files`.split($/)
