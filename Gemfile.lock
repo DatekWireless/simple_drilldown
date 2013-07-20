@@ -4,7 +4,7 @@ PATH
     simple_drilldown (0.0.1)
 
 GEM
-  remote: https://rubygems.org/
+  remote: http://rubygems.org/
   specs:
     rake (10.1.0)
 
