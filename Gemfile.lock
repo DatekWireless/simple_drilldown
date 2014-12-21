@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    simple_drilldown (0.0.2)
+    simple_drilldown (0.0.3)
       rails
 
 GEM

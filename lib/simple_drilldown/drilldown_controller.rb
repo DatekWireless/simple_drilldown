@@ -1,33 +1,37 @@
-module DrilldownController
-  def initialize(fields, default_fields, target_class, select, list_includes, list_order)
+# encoding: UTF-8
+require 'drilldown_helper'
+
+class DrilldownController < ApplicationController
+  include DrilldownHelper
+
+  LIST_LIMIT = 10000
+
+  def initialize(fields, default_fields, target_class, select, base_condition, base_includes, base_group, list_includes, list_order)
     super()
     @fields = fields
     @default_fields = default_fields
+    @default_select_value = DrilldownSearch::SelectValue::COUNT
     @target_class = target_class
     @select = select
+    @base_condition = base_condition
+    @base_includes = base_includes
+    @base_group = base_group
     @list_includes = list_includes
     @list_order = list_order
-  end
-
-  def xml_export
-    params[:search][:list] = '1'
-    index(false)
-    @transactions = get_transactions(@result)
-    headers['Content-Type'] = "text/xml"
-    headers['Content-Disposition'] = 'attachment; filename="transactions.xml"'
-    render :template => '/transaction_drilldown/xml_export', :layout => false
+    @dimension_defs = java.util.concurrent.ConcurrentHashMap.new
+    @summary_fields = []
   end
 
   # ?dimension[0]=supplier&dimension[1]=transaction_type&
   # filter[year]=2009&filter[supplier][0]=Shell&filter[supplier][1]=Statoil
   def index(do_render = true)
-    @search = Search.new(params[:search], @default_fields)
+    @search = DrilldownSearch.new(params[:drilldown_search], @default_fields, @default_select_value)
 
     @transaction_fields = (@search.fields + ((@fields.keys.map { |field_name| field_name.to_s }) - @search.fields))
     @transaction_fields_map = @fields
 
     select = @select.dup
-    includes = []
+    includes = @base_includes.dup
 
     @dimensions = []
     select << ", 'All' as value0"
@@ -44,35 +48,72 @@ module DrilldownController
     includes += filter_includes
     includes.uniq!
     if @search.order_by_value && @dimensions.size <= 1
-      order = @search.select_value == Search::SelectValue::VOLUME ? 'volume DESC' : 'count DESC'
+      order = 'count DESC'
     else
       order = @dimensions.map { |d| d[:select_expression] }.join(', ')
       order = nil if order.empty?
     end
-    group = @dimensions.map { |d| d[:select_expression] }.join(', ')
+    group = (@base_group + @dimensions.map { |d| d[:select_expression] }).join(', ')
     group = nil if group.empty?
 
-    rows = @target_class.find(
-        :all, :select => select, :conditions => conditions,
-        :joins => make_join(@target_class.name.underscore.to_sym, includes), :group => group,
-        :order => order
-    )
+    rows = @target_class.unscoped.where(@base_condition).select(select).where(conditions).
+        joins(make_join([], @target_class.name.underscore.to_sym, includes)).
+        group(group).
+        order(order).all.to_a
 
     if rows.empty?
-      @result = {:value => "All", :count => 0, :volume => 0, :volume_compensated => 0, :row_count => 0, :nodes => 0, :rows => []}
+      @result = {:value => 'All', :count => 0, :row_count => 0, :nodes => 0, :rows => []}
     else
+      if do_render && @search.list && rows.inject(0) { |sum, r| sum + r[:count].to_i } > LIST_LIMIT
+        @search.list = false
+        flash[:notice] = "More than #{LIST_LIMIT} records.  List disabled."
+      end
       @result = result_from_rows(rows, 0, 0, ['All'])
     end
-    @search.list = false if @result[:count] > 10000
 
-    @remaining_dimensions = @dimension_defs.dup.delete_if { |dim_name, dimension| @search.filter[dim_name] && @search.filter[dim_name].size == 1 }
+    remove_duplicates(@result) unless @base_group.empty?
+
+    @remaining_dimensions = @dimension_defs.dup.delete_if do |dim_name, dimension|
+      (@search.filter[dim_name] && @search.filter[dim_name].size == 1) ||
+      (@dimensions.any?{|d| d[:url_param_name] == dim_name})
+    end
+
     populate_list(conditions, includes, @result, []) if @search.list
-    render :template => '/transaction_drilldown/index' if do_render
+    render :template => '/drilldown/index' if do_render
+  end
+
+  def remove_duplicates(result)
+    rows = result[:rows]
+    return 0 unless rows
+    removed_rows = 0
+    prev_row = nil
+    rows.each do |r|
+      if prev_row
+        if prev_row[:value] == r[:value]
+          prev_row[:count] += r[:count]
+          prev_row[:row_count] = [prev_row[:row_count], r[:row_count]].max
+          prev_row[:nodes] = [prev_row[:nodes], r[:nodes]].max
+          prev_row[:rows] += r[:rows] if prev_row[:rows] || r[:rows]
+          r[:value] = nil
+          removed_rows += r[:nodes]
+        end
+      end
+      prev_row = r unless r[:value].nil?
+    end
+    rows.delete_if { |r| r[:value].nil? }
+    rows.each do |r|
+      removed_child_rows = remove_duplicates(r)
+      removed_rows += removed_child_rows
+    end
+    result[:row_count] -= removed_rows
+    result[:nodes] -= removed_rows
+    removed_rows
   end
 
   # Empty summary rows are needed to plot zero points in the charts
   def add_zero_results(result_rows, dimension)
     legal_values = legal_values_for(@dimensions[dimension][:url_param_name], true).call(@search).map { |lv| lv[1] }
+    legal_values.reverse! if @dimensions[dimension][:reverse]
     current_values = result_rows.map { |r| r[:value] }.compact
     empty_values = legal_values - current_values
 
@@ -81,8 +122,6 @@ module DrilldownController
         sub_result = {
             :value => v,
             :count => 0,
-            :volume => 0,
-            :volume_compensated => 0,
             :row_count => 0,
             :nodes => 0,
         }
@@ -106,10 +145,8 @@ module DrilldownController
       return {
           :value => values[-1],
           :count => row[:count].to_i,
-          :volume => row[:volume].to_i,
-          :volume_compensated => row[:volume_compensated].to_i,
           :row_count => 1,
-          :nodes => 1,
+          :nodes => @search.list ? 2 : 1,
       }
     end
 
@@ -127,8 +164,6 @@ module DrilldownController
     {
         :value => values[-1],
         :count => result_rows.inject(0) { |t, r| t + r[:count].to_i },
-        :volume => result_rows.inject(0) { |t, r| t + r[:volume] },
-        :volume_compensated => result_rows.inject(0) { |t, r| t + r[:volume_compensated] },
         :row_count => result_rows.inject(0) { |t, r| t + r[:row_count] },
         :nodes => result_rows.inject(0) { |t, r| t + r[:nodes] } + 1,
         :rows => result_rows,
@@ -137,24 +172,15 @@ module DrilldownController
 
   def html_export
     index(false)
-    render :template => '/transaction_drilldown/html_export', :layout => 'print'
+    render template: '/drilldown/html_export', layout: '../drilldown/print'
   end
 
   def excel_export
     index(false)
-    headers['Content-Type'] = "application/vnd.ms-excel"
-    headers['Content-Disposition'] = 'attachment; filename="transactions.xml"'
+    headers['Content-Type'] = 'application/vnd.ms-excel'
+    headers['Content-Disposition'] = 'attachment; filename="elections.xls"'
     headers['Cache-Control'] = ''
-    render :template => '/transaction_drilldown/excel_export', :layout => false
-  end
-
-  def excel_export_transactions
-    params[:search][:list] = '1'
-    index(false)
-    @transactions = get_transactions(@result)
-    headers['Content-Type'] = "application/vnd.ms-excel"
-    headers['Content-Disposition'] = 'attachment; filename="transactions.xml"'
-    render :template => '/transaction_drilldown/excel_export_transactions', :layout => false
+    render :template => '/drilldown/excel_export', :layout => false
   end
 
   private
@@ -175,11 +201,9 @@ module DrilldownController
         end
       end
       options[:include].uniq!
-      if @search.last_change_time
-        options[:include] << {:assignment => {:order => :last_aircraft_registration_change}} if @search.fields.include? 'aircraft_registration'
-        options[:include] << {:assignment => {:order => :last_fuel_request_change}} if @search.fields.include? 'fuel_request'
-      end
-      result[:transactions] = @target_class.all(options.update(:conditions => list_conditions(conditions, values)))
+
+      joins = make_join([], @target_class.name.underscore.to_sym, options.delete(:include))
+      result[:transactions] = @target_class.joins(joins).where(@base_condition).where(list_conditions(conditions, values)).includes(options[:include]).order(options[:order]).all
     end
   end
 
@@ -192,7 +216,7 @@ module DrilldownController
   end
 
   def make_conditions(search_filter)
-    includes = []
+    includes = @base_includes.dup
     if search_filter
       condition_strings = []
       condition_values = []
@@ -203,14 +227,22 @@ module DrilldownController
         raise "Unknown filter field: #{field.inspect}" if dimension_def.nil?
         values = [*values]
         if dimension_def[:interval]
-          if dimension_def[:condition_values_method]
-            condition_values += dimension_def[:condition_values_method].call(values)
-          else
-            condition_values += [*values]
+          values *= 2 if values.size == 1
+          raise "Need 2 values for interval filter: #{values.inspect}" if values.size != 2
+          if !values[0].blank? && !values[1].blank?
+            condition_strings << "#{dimension_def[:select_expression]} BETWEEN ? AND ?"
+            condition_values += values
+            filter_texts << "#{dimension_def[:pretty_name]} #{dimension_def[:label_method] ? dimension_def[:label_method].call(values) : "from #{values[0]} to #{values[1]}"}"
+          elsif !values[0].blank?
+            condition_strings << "#{dimension_def[:select_expression]} >= ?"
+            condition_values < values[0]
+            filter_texts << "#{dimension_def[:pretty_name]} #{dimension_def[:label_method] ? dimension_def[:label_method].call(values) : "from #{values[0]}"}"
+          elsif !values[1].blank?
+              condition_strings << "#{dimension_def[:select_expression]} <= ?"
+              condition_values < values[1]
+              filter_texts << "#{dimension_def[:pretty_name]} #{dimension_def[:label_method] ? dimension_def[:label_method].call(values) : "to #{values[1]}"}"
           end
-          filter_texts << "#{dimension_def[:pretty_name]} #{dimension_def[:label_method] ? dimension_def[:label_method].call(values) : "from #{values[0]} to #{values[1] || values[0]}"}"
           includes << dimension_def[:includes] if dimension_def[:includes]
-          condition_strings << dimension_def[:condition_string]
         else
           condition_strings << values.map do |value|
             if dimension_def[:condition_values_method]
@@ -220,12 +252,12 @@ module DrilldownController
             end
             filter_texts << "#{dimension_def[:pretty_name]} #{dimension_def[:label_method] ? dimension_def[:label_method].call(value) : value}"
             includes << dimension_def[:includes] if dimension_def[:includes]
-            dimension_def[:condition_string]
+            "(#{dimension_def[:select_expression]}) = ?"
           end.join(' OR ')
         end
       end
       filter_text = filter_texts.join(' and ')
-      conditions = [condition_strings.map { |c| "(#{c})" }.join(" AND "), *condition_values]
+      conditions = [condition_strings.map { |c| "(#{c})" }.join(' AND '), *condition_values]
       includes.uniq!
     else
       filter_text = nil
@@ -248,70 +280,90 @@ module DrilldownController
         end
         includes.uniq!
       end
-      rows = @target_class.find(
-          :all,
-          :select => "DISTINCT(#{dimension[:select_expression]}) AS value",
-          :conditions => conditions,
-          :joins => make_join(@target_class.name.underscore.to_sym, includes),
-          :order => 'value'
-      )
+      rows = @target_class.unscoped.where(@base_condition).
+          select("#{dimension[:select_expression]} AS value").
+          where(conditions).
+          joins(make_join([], @target_class.name.underscore.to_sym, includes)).
+          order('value').
+          group('value').all.to_a
       if search.filter[field.to_s]
         search.filter[field.to_s].each do |selected_value|
-          unless rows.find { |r| r[:value] == selected_value }
+          unless rows.find { |r| dimension[:label_method].call(r[:value]) == selected_value }
             rows << {:value => selected_value}
           end
         end
-        rows.sort_by { |r| r[:value] }
       end
-      values = rows.map { |r| [dimension[:label_method] && dimension[:label_method].call(r[:value]) || r[:value], r[:value]] }
+      values = rows.map {|r|[dimension[:label_method] && dimension[:label_method].call(r[:value]) || r[:value], r[:value]]}.sort_by{|a| a[0].upcase}
+      values.reverse! if dimension[:reverse]
       values
     end
   end
 
-  def dimension(name, select_expression, options = {})
+  def dimension(name, select_expression = name.to_s, options = {})
     includes = options.delete(:includes)
     interval = options.delete(:interval)
-    label_method = options.delete(:label_method)
+    label_method = options.delete(:label_method) || lambda{|f|f.to_s}
     legal_values = options.delete(:legal_values) || legal_values_for(name)
+    reverse = options.delete(:reverse)
 
     raise "Unknown options: #{options.keys.inspect}" unless options.empty?
 
     @dimension_defs[name.to_s] = {
         :select_expression => select_expression,
-        :condition_string => interval ? "#{select_expression} BETWEEN ? AND ?" : "(#{select_expression}) = ?",
-        :condition_values_method => interval ? lambda { |values| [values[0], values[1] || values[0]] } : nil,
         :pretty_name => t(name),
         :url_param_name => name.to_s,
         :legal_values => legal_values,
         :label_method => label_method,
+        :reverse => reverse,
         :includes => includes,
         :interval => interval,
     }
   end
 
-  def get_transactions(tree)
-    return tree[:transactions] if tree[:transactions]
-    tree[:rows].map { |r| get_transactions(r) }.flatten
-  end
-
-  def make_join(model, include)
+  def make_join(joins, model, include, model_class = model.to_s.camelize.constantize)
     case include
     when Array
-      include.map { |i| make_join(model, i) }.join(' ')
+      include.map { |i| make_join(joins, model, i) }.join(' ')
     when Hash
       sql = ''
       include.each do |parent, child|
-        parent_table = parent.to_s.pluralize
-        sql << make_join(model, parent) + ' '
-        sql << make_join(parent, child)
+        sql << make_join(joins, model, parent) + ' '
+        ass = model.to_s.camelize.constantize.reflect_on_association parent
+        sql << make_join(joins, parent, child, ass.class_name.constantize)
       end
       sql
     when Symbol
-      ass = model.to_s.camelize.constantize.reflect_on_association include
+      return '' if joins.include?(include)
+      joins << include
+      ass = model_class.reflect_on_association include
+      raise "Unknown association: #{model} => #{include}" unless ass
+      model_table = model.to_s.pluralize
       include_table = ass.table_name
-      "LEFT JOIN #{include_table} ON #{include_table}.id = #{model.to_s.pluralize}.#{include}_id"
+      include_alias = include.to_s.pluralize
+      case ass.macro
+      when :belongs_to
+        "LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.id = #{model_table}.#{include}_id"
+      when :has_one, :has_many
+        fk_col = ass.options[:foreign_key] || "#{model}_id"
+        sql = "LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.#{fk_col} = #{model_table}.id"
+        if (ass_order = ass.options[:order].try(:to_s))
+          ass_order.sub!(/ DESC\s*$/i, '')
+          ass_order_prefixed = ass_order.dup
+          ActiveRecord::Base.connection.columns(include_table).map(&:name).each do |cname|
+            ass_order_prefixed.gsub!(/\b#{cname}\b/, "#{include_alias}.#{cname}")
+          end
+          sql << " AND  #{ass_order_prefixed} = (SELECT MIN(#{ass_order}) FROM #{include_table} t2 WHERE t2.#{fk_col} = #{model_table}.id #{'AND t2.deleted_at IS NULL' if ass.klass.paranoid?})"
+        end
+        sql
+      else
+        raise "Unknown association type: #{ass.macro}"
+      end
+    when String
+      include
+    when nil
+      ''
     else
-      raise 'Unknown join class: #{include.inspect}'
+      raise "Unknown join class: #{include.inspect}"
     end
   end
 

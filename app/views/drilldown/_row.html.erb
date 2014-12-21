@@ -1,0 +1,13 @@
+<tr valign="top">
+  <% @search.fields.each do |field| %>
+      <td>
+        <% if field == 'time' %>
+            <%= (transaction.respond_to?(:completed_at) ? transaction.completed_at : transaction.created_at).localtime.strftime('%Y-%m-%d %H:%M') %>
+        <% else %>
+            <% field_def = @transaction_fields_map[field.to_sym] %>
+            <%= field_def[:attr_method] ? field_def[:attr_method].call(transaction) : transaction.send(field) %>
+        <% end %>
+      </td>
+  <% end %>
+  <td><%= detour_to t(:show), transaction %></td>
+</tr>

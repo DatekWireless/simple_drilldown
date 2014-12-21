@@ -1,0 +1,107 @@
+<% @page_title = "#{caption} #{subcaption}" %>
+<%= javascript_include_tag 'FusionCharts' %>
+<%= stylesheet_link_tag 'drilldown' %>
+<style type="text/css">
+    table#drill_down_layout > tbody > tr > td {
+        border: none;
+        font-size: 13px
+    }
+
+    table#drill_down_layout td {
+        padding: 2px;
+        line-height: 18px
+    }
+</style>
+
+<%= form_for @search, :html => {:id => 'edit_search_SEARCH', :method => :get, :class => :search, :style => 'background: inherit', :onsubmit => 'return this.submit()'}, :url => {} do |form| %>
+    <div class="row">
+      <div class="col-md-3" valign="top">
+        <ul class="nav nav-tabs">
+          <li class="active">
+            <a href="#filter" data-toggle="tab"><em><%= t :filter %></em></a></li>
+          <li><a href="#fields" data-toggle="tab"><em><%= t :fields %></em></a>
+          </li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+          <div class="tab-pane active" id="filter">
+            <%= render :partial => '/drilldown/tab_buttons', :locals => {:form => form} %>
+            <%= render :partial => '/drilldown/filter', :locals => {:form => form} %>
+          </div>
+          <div class="tab-pane" id="fields">
+            <%= render :partial => '/drilldown/tab_buttons', :locals => {:form => form} %>
+            <%= render :partial => '/drilldown/fields', :locals => {:form => form} %>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-md-9">
+        <div class="row" valign="top">
+          <div class="col-md-12">
+            <%= render :partial => '/drilldown/chart', :locals => {:form => form} %>
+            <br/>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12" valign="top">
+            <div style="float: right; clear: both;">
+              <%= link_to 'Excel', @search.url_options.merge(action: :excel_export) %>&nbsp;|
+              <%= link_to 'HTML', @search.url_options.merge(action: :html_export), :data_popup => ['Elections', 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes, width=1024px'] %>
+            </div>
+            <br/>
+
+            <%= render :partial => '/drilldown/summary_table' %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+<% end %> <!-- END  FORM -->
+
+<%=javascript_tag do %>
+form = document.getElementById("edit_search_SEARCH");
+form.submit = function() {
+    elements = form.elements;
+    params = new Array();
+    for (var el, i = 0; (el = elements[i] ); i++) {
+      if (el.type == "text" && el.value == "") {
+        continue;
+      }
+      if (el.type == "select-multiple") {
+        if (el.selectedIndex > 0) {
+          for (var j = 0; j < el.options.length; j++) {
+            // Ignore "All" and unselected options
+            if (el.options[j].selected) {
+              params.push("" + el.name + "=" + encodeURIComponent(el.options[j].value));
+            }
+          }
+        }
+        continue;
+      }
+      if (el.type == "select-one" && el.selectedIndex == 0) {
+        continue;
+      }
+      if (el.type == "checkbox" && el.checked != true) {
+        continue;
+      }
+      if (el.type == "radio" && el.checked != true) {
+        continue;
+      }
+      if (el.type == "hidden" && (el.value == "0" || el.value == "")) {
+        continue;
+      }
+      if (el.type == "submit") {
+        continue;
+      }
+      params.push("" + el.name + "=" + encodeURIComponent(el.value));
+    }
+    location = form.action + "?" + params.join('&');
+    return false;
+};
+
+$(document).ready(function () {
+  $('[data-behaviour~=datepicker]').datepicker({format: "yyyy-mm-dd"});
+})
+<% end %>

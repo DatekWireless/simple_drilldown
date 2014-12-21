@@ -1,0 +1,20 @@
+<div class="form-group">
+  <%= form.label :title, t(:title) %>
+  <%= form.text_field :title, class: 'form-control' %>
+</div>
+
+<% choices = java.util.concurrent.ConcurrentHashMap.new %>
+<% threads = @dimension_defs.keys.map do |dimension_name| %>
+    <% dimension = @dimension_defs[dimension_name] %>
+    <% t = Thread.start do |thread| %>
+        <% ActiveRecord::Base.connection_pool.with_connection do %>
+            <% choices[dimension_name] = [[t(:all), nil]] + (dimension[:legal_values] && dimension[:legal_values].call(@search).map { |o| o.is_a?(Array) ? [o[0].to_s, o[1].to_s] : o.to_s } || []) %>
+        <% end %>
+    <% end %>
+    <% next [t, dimension_name] %>
+<% end %>
+<% threads.each do |t, dimension_name| %>
+    <% t.join %>
+    <%= render partial: 'field', locals: {choices: choices[dimension_name] || [],
+            form: form, dimension_name: dimension_name} %>
+<% end %>
