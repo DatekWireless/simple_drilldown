@@ -1,13 +1,15 @@
-xml.instruct! :xml, :version => '1.0', :encoding => 'UTF-8'
-xml.instruct! 'mso-application', :progid => 'Excel.Sheet'
+# frozen_string_literal: true
+
+xml.instruct! :xml, version: '1.0', encoding: 'UTF-8'
+xml.instruct! 'mso-application', progid: 'Excel.Sheet'
 
 xml.Workbook(
-    'xmlns' => 'urn:schemas-microsoft-com:office:spreadsheet',
-    'xmlns:o' => 'urn:schemas-microsoft-com:office:office',
-    'xmlns:x' => 'urn:schemas-microsoft-com:office:excel',
-    'xmlns:ss' => 'urn:schemas-microsoft-com:office:spreadsheet',
-    'xmlns:html' => 'http://www.w3.org/TR/REC-html40') do
-
+  'xmlns' => 'urn:schemas-microsoft-com:office:spreadsheet',
+  'xmlns:o' => 'urn:schemas-microsoft-com:office:office',
+  'xmlns:x' => 'urn:schemas-microsoft-com:office:excel',
+  'xmlns:ss' => 'urn:schemas-microsoft-com:office:spreadsheet',
+  'xmlns:html' => 'http://www.w3.org/TR/REC-html40'
+) do
   xml << render('/drilldown/excel_styles')
 
   xml.Worksheet 'ss:Name' => 'Transaction Summary' do
@@ -26,11 +28,11 @@ xml.Workbook(
       xml.Row do
         @dimensions.each do |d|
           xml.Cell 'ss:StyleID' => 'Heading' do
-            xml.Data "#{h d[:pretty_name]}", 'ss:Type' => 'String'
+            xml.Data (h d[:pretty_name]).to_s, 'ss:Type' => 'String'
           end
         end
         xml.Cell 'ss:StyleID' => 'Heading' do
-          xml.Data "#{t :count}", 'ss:Type' => 'String'
+          xml.Data (t :count).to_s, 'ss:Type' => 'String'
         end
       end
 
@@ -38,4 +40,3 @@ xml.Workbook(
     end
   end
 end
-

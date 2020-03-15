@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 xml.Styles do
   xml.Style 'ss:ID' => 'Default', 'ss:Name' => 'Normal' do
     xml.Alignment 'ss:Vertical' => 'Center'
@@ -36,7 +38,7 @@ xml.Styles do
   end
   xml.Style 'ss:ID' => 'Sum' do
     xml.Borders do
-      %w(Top Left Right).each do |pos|
+      %w[Top Left Right].each do |pos|
         xml.Border 'ss:Position' => pos
       end
       xml.Border 'ss:Position' => 'Bottom', 'ss:Weight' => '1'
@@ -59,7 +61,7 @@ xml.Styles do
     xml.NumberFormat 'ss:Format' => 'hh:mm;@'
   end
   xml.Style 'ss:ID' => 'LongDate' do
-    xml.NumberFormat 'ss:Format' => "dd/mm/yyyy\\ hh:mm:ss"
+    xml.NumberFormat 'ss:Format' => 'dd/mm/yyyy\\ hh:mm:ss'
   end
   xml.Style 'ss:ID' => 'VerticalCenter' do
     xml.Alignment 'ss:Vertical' => 'Center'

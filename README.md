@@ -4,20 +4,6 @@ simple_drilldown offers a simple way to define axis to filter and group records
 for analysis.  The result is a record count for the selected filter and
 distribution and the option to list the actual records.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'simple_drilldown'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install simple_drilldown
-
 ## Usage
 
 ### Rails
@@ -134,6 +120,24 @@ You need the following views:
 {excel_type: 'Number', excel_style: 'ThreeDecimalNumberFormat'}
 ```
 
+## Installation
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'simple_drilldown'
+```
+
+And then execute:
+```bash
+$ bundle
+```
+
+Or install it yourself as:
+```bash
+$ gem install simple_drilldown
+```
+
 ## Contributing
 
 1. Fork it
@@ -141,3 +145,6 @@ You need the following views:
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## License
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
