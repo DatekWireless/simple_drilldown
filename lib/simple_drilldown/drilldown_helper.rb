@@ -9,7 +9,7 @@ module SimpleDrilldown
 
     def caption
       result = @search.title ? @search.title : "#{@target_class} #{t(@search.select_value.downcase)}" +
-          ((@dimensions && @dimensions.any?) ? ' by ' + @dimensions.map { |d| d[:pretty_name] }.join(' and ') : '')
+        ((@dimensions && @dimensions.any?) ? ' by ' + @dimensions.map { |d| d[:pretty_name] }.join(' and ') : '')
       result.gsub('$date', [*@search.filter[:calendar_date]].uniq.join(' - '))
     end
 

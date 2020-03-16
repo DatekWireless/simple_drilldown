@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'test_helper'
 require 'generators/drilldown_controller/drilldown_controller_generator'
 

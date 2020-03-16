@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_model/naming'
 
 module SimpleDrilldown
@@ -14,6 +16,7 @@ module SimpleDrilldown
     module SelectValue
       COUNT = 'COUNT'
       VOLUME = 'VOLUME'
+      VOLUME_COMPENSATED = 'VOLUME_COMPENSATED'
     end
 
     attr_reader :dimensions
@@ -22,14 +25,22 @@ module SimpleDrilldown
     attr_reader :filter
     attr_accessor :list
     attr_accessor :percent
-    attr_reader :last_change_time
+    attr_reader :list_change_times
     attr_reader :order_by_value
     attr_reader :select_value
     attr_reader :title
     attr_reader :default_fields
 
-    def initialize(attributes_or_search, default_fields = nil, default_select_value = nil)
-      if attributes_or_search.is_a? Search
+    def self.validators_on(_attribute)
+      []
+    end
+
+    def self.human_attribute_name(attribute)
+      attribute
+    end
+
+    def initialize(attributes_or_search, default_fields = nil, default_select_value = SelectValue::COUNT)
+      if attributes_or_search.is_a? self.class
         s = attributes_or_search
         @dimensions = s.dimensions.dup
         @display_type = s.display_type.dup
@@ -37,7 +48,7 @@ module SimpleDrilldown
         @filter = s.filter.dup
         @list = s.list
         @percent = s.percent
-        @last_change_time = s.last_change_time
+        @list_change_times = s.list_change_times
         @order_by_value = s.order_by_value
         @select_value = s.select_value.dup
         @title = s.title
@@ -45,45 +56,48 @@ module SimpleDrilldown
       else
         attributes = attributes_or_search
         @default_fields = default_fields
+        @default_select_value = default_select_value
         @dimensions = attributes && attributes[:dimensions] || []
-        @dimensions.delete_if { |d| d.empty? }
+        @dimensions.delete_if(&:empty?)
         @filter = attributes && attributes[:filter] ? attributes[:filter] : {}
-        @filter.each { |k, v| v.delete('') }
-        @filter.delete_if { |k, v| v.empty? }
-        @display_type = attributes && attributes[:display_type] ? attributes[:display_type] : DisplayType::NONE
-        if @dimensions.size >= 2 && @display_type == DisplayType::PIE
-          @display_type = DisplayType::BAR
+        @filter.keys.dup.each { |k| @filter[k] = [*@filter[k]] }
+        @filter.each do |_k, v|
+          v.delete('')
+          v.delete('Select Some Options')
         end
+        @filter.delete_if { |_k, v| v.empty? }
+        @display_type = attributes && attributes[:display_type] ? attributes[:display_type] : DisplayType::NONE
+        @display_type = DisplayType::BAR if @dimensions.size >= 2 && @display_type == DisplayType::PIE
 
         @order_by_value = attributes && (attributes[:order_by_value] == '1')
-        @select_value = attributes && attributes[:select_value] && attributes[:select_value].size > 0 ? attributes[:select_value] : SelectValue::COUNT
-        @list = attributes && attributes[:list] && attributes[:list] == '1' || false
+        @select_value = attributes&.dig(:select_value).present? ? attributes[:select_value] : @default_select_value
+        @list = attributes&.[](:list) == '1'
         @percent = attributes&.[](:percent) == '1'
-        @last_change_time = attributes && attributes[:last_change_time] && attributes[:last_change_time] == '1' || false
-        if (attributes && attributes[:fields])
-          if attributes[:fields].is_a?(Array)
-            @fields = attributes[:fields]
-          else
-            @fields = attributes[:fields].select { |k, v| v == '1' }.map { |k, v| k }
-          end
-        else
-          @fields = @default_fields
-        end
-        @title = attributes[:title] if attributes && attributes[:title] && attributes[:title].size > 0
+        @list_change_times = attributes&.[](:list_change_times) == '1'
+        @fields = if attributes && attributes[:fields]
+                    if attributes[:fields].is_a?(Array)
+                      attributes[:fields]
+                    else
+                      attributes[:fields].to_h.select { |_k, v| v == '1' }.map { |k, _v| k }
+                    end
+                  else
+                    @default_fields
+                  end
+        @title = attributes[:title] if attributes&.dig(:title).present?
       end
     end
 
     def url_options
       o = {
-          :search => {
-              :title => title,
-              :list => list ? '1' : '0',
-              :last_change_time => last_change_time ? '1' : '0',
-              :filter => filter,
+          search: {
+              title: title,
+              list: list ? '1' : '0',
               percent: percent ? '1' : '0',
-              :dimensions => dimensions,
-              :display_type => display_type,
-          }
+              list_change_times: list_change_times ? '1' : '0',
+              filter: filter,
+              dimensions: dimensions,
+              display_type: display_type,
+          },
       }
       o[:search][:fields] = fields unless fields == @default_fields
       o
@@ -95,8 +109,9 @@ module SimpleDrilldown
     end
 
     def drill_down(dimensions, *values)
-      raise "Too many values" if values.size > self.dimensions.size
-      s = Search.new(self)
+      raise 'Too many values' if values.size > self.dimensions.size
+
+      s = self.class.new(self)
       values.each_with_index { |v, i| s.filter[dimensions[i][:url_param_name]] = [v] }
       values.size.times { s.dimensions.shift }
       s
