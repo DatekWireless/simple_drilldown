@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.org/DatekWireless/simple_drilldown.svg?branch=master)](https://travis-ci.org/DatekWireless/simple_drilldown)
+<a href="https://travis-ci.org/DatekWireless/simple_drilldown">
+<img align="right" src="https://travis-ci.org/DatekWireless/simple_drilldown.svg?branch=master" alt="Build Status">
+</a>
 
 # SimpleDrilldown
 
