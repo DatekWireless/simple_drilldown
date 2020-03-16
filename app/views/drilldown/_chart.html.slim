@@ -1,0 +1,52 @@
+ruby:
+  data =
+          case @dimensions.size
+          when 0
+            { @result[:value] => @result[:count] }
+          when 1
+            @result[:rows].map { |r| [ @dimensions[0][:label_method] ? @dimensions[0][:label_method].call(r[:value]) : r[:value], r[:count] ] }
+          when 2
+            @result[:rows].map do |r|
+              {
+                      name: r[:value],
+                      data: r[:rows].map { |r2| [r2[:value], r2[:count]] }
+              }
+            end
+          when 3
+          end
+- case @search.display_type
+- when SimpleDrilldown::Search::DisplayType::PIE
+  = pie_chart @chart_data, height: '24rem'
+- when SimpleDrilldown::Search::DisplayType::BAR
+  = column_chart data, height: '24rem'
+- when SimpleDrilldown::Search::DisplayType::LINE
+  = line_chart data, height: '24rem'
+- else
+  #drilldown_area
+    h2 = caption
+    h3 = subcaption
+    br
+#drilldown_search_area style="margin-left: auto; margin-right: auto; text-align: center"
+  - (0..2).each do |i|
+    - options = [['', '']]
+    - options << [@dimensions[i][:pretty_name], @dimensions[i][:url_param_name]] if @dimensions[i]
+    - options += @remaining_dimensions.keys.map { |name| [@dimension_defs[name][:pretty_name], name] }
+    | #{t(i == 0 ? :group_by : :then_by)}:
+    = form.select 'dimensions', options, { :selected => @search.dimensions && @search.dimensions[i] }, \
+        { :onChange => 'form.submit()', :name => 'search[dimensions][]', :id => "search_dimensions_#{i}" }
+  br
+  = t :chart_type
+  = form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::BAR, { :onChange => 'form.submit()' }
+  = form.label :display_type_bar, t(:bar)
+  = form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::PIE, { :disabled => @search.dimensions.size >= 2, :onChange => 'form.submit()' }
+  = form.label :display_type_pie, t(:pie)
+  = form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::LINE, { :onChange => 'form.submit()' }
+  = form.label :display_type_line, t(:line)
+  = form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::NONE, { :onChange => 'form.submit()' }
+  = form.label :display_type_none, t(:none)
+
+  = form.check_box :order_by_value, { :onChange => 'form.submit()' }
+  = form.label :order_by_value, t(:order_by_value)
+
+  = form.check_box :list, { :onChange => 'form.submit()' }
+  = form.label :list, t(:list)
