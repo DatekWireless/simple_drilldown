@@ -416,7 +416,7 @@ module SimpleDrilldown
         options[:include].uniq!
 
         joins = self.class.make_join([], @target_class.name.underscore.to_sym, options.delete(:include))
-        result[:transactions] = @target_class.joins(joins).where(@base_condition).where(list_conditions(conditions, values)).includes(options[:include]).order(options[:order]).all
+        result[:transactions] = @target_class.unscoped.joins(joins).where(@base_condition).where(list_conditions(conditions, values)).includes(options[:include]).order(options[:order]).all
       end
     end
 
