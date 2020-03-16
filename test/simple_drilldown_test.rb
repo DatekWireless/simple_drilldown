@@ -1,7 +1,7 @@
-require 'helper'
+require 'test_helper'
 
-class SimpleDrilldownTest < Minitest::Test
-  should "probably rename this file and start testing for real" do
-    flunk "hey buddy, you should probably rename this file and start testing for real"
+class SimpleDrilldown::Test < ActiveSupport::TestCase
+  test "truth" do
+    assert_kind_of Module, SimpleDrilldown
   end
 end

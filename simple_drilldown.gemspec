@@ -1,25 +1,33 @@
-# coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+$:.push File.expand_path('lib', __dir__)
+
+# Maintain your gem's version:
 require 'simple_drilldown/version'
 
+# Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
-  spec.name          = 'simple_drilldown'
-  spec.version       = SimpleDrilldown::VERSION
-  spec.authors       = ['Uwe Kubosch']
-  spec.email         = %w(uwe@kubosch.no)
-  spec.summary       = %q{Simple data warehouse and drilldown.}
-  spec.description   = %q{simple_drilldown offers a simple way to define axis to filter and group records for analysis.}
-  spec.homepage      = 'http://github.com/datekwireless/simple_drilldown'
-  spec.license       = 'MIT'
+  spec.name        = 'simple_drilldown'
+  spec.version     = SimpleDrilldown::VERSION
+  spec.authors     = ['Uwe Kubosch']
+  spec.email       = ['uwe@datek.no']
+  spec.homepage    = 'http://github.com/datekwireless/simple_drilldown'
+  spec.summary     = 'Simple data warehouse and drilldown.'
+  spec.description = 'simple_drilldown offers a simple way to define axis to filter and group records for analysis.'
+  spec.license     = 'MIT'
 
-  spec.files         = `git ls-files`.split($/)
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = %w(lib)
+  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
+  # to allow pushing to a single host or delete this section to allow pushing to any host.
+  if spec.respond_to?(:metadata)
+    spec.metadata['allowed_push_host'] = 'https://rubygems.org/'
+  else
+    raise 'RubyGems 2.0 or newer is required to protect against ' \
+      'public gem pushes.'
+  end
+
+  spec.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
   spec.add_dependency 'rails', '>=5.2', '<7'
-  spec.add_development_dependency 'bundler', '~> 1.3'
-  spec.add_development_dependency 'rake'
+  spec.add_dependency 'chartkick', '~>3.3'
+
   spec.add_development_dependency 'rubocop', '~>0.80'
+  spec.add_development_dependency 'sqlite3'
 end

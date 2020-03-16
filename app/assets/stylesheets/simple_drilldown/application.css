@@ -1,0 +1,121 @@
+table {
+  border: none;
+}
+
+th {
+  border: 1px solid #dfded2;
+  padding: 2px;
+  font-size: 10pt;
+  font-weight: bold;
+  background-color: #dddddd;
+  text-align: center;
+}
+
+th.header {
+  font-weight: bold;
+  text-align: center;
+}
+
+td {
+  border: 1px solid #dfded2;
+  padding: 2px;
+  font-size: 10px;
+}
+
+td.numeric {
+  text-align: right;
+}
+
+tr.sum {
+  text-align: right;
+  border-top: 2px solid black;
+}
+
+tr.summary {
+  background-color: #eeeeee;
+  font-weight: bold;
+}
+
+tr.credit_record {
+  color: orange;
+}
+
+tr.deleted {
+  background-color: #ffff88;
+}
+
+tr.reading {
+  background-color: #fffff0;
+  font-weight: bold;
+}
+
+tr.context_record {
+  background-color: #eeeeee;
+}
+
+table.border_table {
+  border: 2px solid black;
+  border-spacing: 1em;
+  border-collapse: collapse;
+}
+
+table.border_table td {
+  border: 1px solid #dfded2;
+  border-bottom-width: 0;
+}
+
+table.border_table th {
+  border: 2px solid black;
+}
+
+#stock_report tr.month th {
+  border-bottom: 0;
+}
+
+table.border_table tr.year td {
+  border-top: 0;
+}
+
+table.border_table tr.year th {
+  border-top: 0;
+}
+
+form.search {
+  padding: 0;
+}
+
+form.search label, form.search .label {
+  min-width: inherit;
+  font-size: inherit;
+}
+
+table#search th {
+  border: 0;
+}
+
+table#search td {
+  border: 0;
+}
+
+table#drill_down_layout > tbody > tr > td {
+    border: none;
+    font-size: 13px
+}
+
+table#drill_down_layout td {
+    padding: 2px;
+    margin: 0;
+    line-height: 18px
+}
+
+table#drill_down_layout table{
+    border: none;
+}
+
+table#drill_down_layout {
+    border: none;
+}
+
+table#search_fields td {
+    border: none;
+}

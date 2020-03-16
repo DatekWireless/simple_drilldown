@@ -6,8 +6,8 @@
         <%= form.label "filter[calendar_date]", t(:from_date) %>
       </td>
       <td>
-        <input type="text" data-behaviour="datepicker" id="drilldown_search_filter[from_<%=dimension_name%>]"
-               name="drilldown_search[filter][<%=dimension_name%>][]" class="form-control" value="<%=dates[0]%>"
+        <input type="text" data-behaviour="datepicker" id="search_filter[from_<%=dimension_name%>]"
+               name="search[filter][<%=dimension_name%>][]" class="form-control" value="<%=dates[0]%>"
                placeholder="yyyy-mm-dd"/>
       </td>
     </tr>
@@ -16,20 +16,20 @@
         <%= form.label "filter[calendar_date]", t(:to_date) %>
       </td>
       <td>
-        <input type="text" data-behaviour="datepicker" id="drilldown_search_filter[to_<%=dimension_name%>]"
-               name="drilldown_search[filter][<%=dimension_name%>][]" class="form-control" value="<%=dates[1] || dates[0]%>"
+        <input type="text" data-behaviour="datepicker" id="search_filter[to_<%=dimension_name%>]"
+               name="search[filter][<%=dimension_name%>][]" class="form-control" value="<%=dates[1] || dates[0]%>"
                placeholder="yyyy-mm-dd"/>
       </td>
     </tr>
 <% else %>
     <div class="form-group">
       <%= form.label "filter[#{dimension_name}]", t(dimension_name) %>
-      <%= select :drilldown_search, :filter,
+      <%= select :search, :filter,
               choices,
               {:selected => @search.filter[dimension_name]},
               {
-                      id: "drilldown_search_filter[#{dimension_name}]",
-                      name: "drilldown_search[filter][#{dimension_name}][]",
+                      id: "search_filter[#{dimension_name}]",
+                      name: "search[filter][#{dimension_name}][]",
                       size: 5,
                       multiple: true,
                       class: 'form-control',

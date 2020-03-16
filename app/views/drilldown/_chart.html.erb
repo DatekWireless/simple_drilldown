@@ -5,11 +5,11 @@
 
    type = nil
    case @search.display_type
-     when DrilldownSearch::DisplayType::PIE
+     when SimpleDrilldown::Search::DisplayType::PIE
        type = 'Pie3D'
-     when DrilldownSearch::DisplayType::BAR
+     when SimpleDrilldown::Search::DisplayType::BAR
        type = (@search.dimensions && @search.dimensions.size >= 2) ? 'MSCombi3D' : 'Column2D'
-     when DrilldownSearch::DisplayType::LINE
+     when SimpleDrilldown::Search::DisplayType::LINE
        type = (@search.dimensions && @search.dimensions.size >= 2) ? 'MSLine' : 'Line'
    end
    if type %>
@@ -35,18 +35,18 @@
       %>
       <%= t(i == 0 ? :group_by : :then_by) %>:
       <%= form.select 'dimensions', options, {:selected => @search.dimensions && @search.dimensions[i]},
-                      {:onChange => 'form.submit()', :name => 'drilldown_search[dimensions][]', :id => "drilldown_search_dimensions_#{i}"}
+                      {:onChange => 'form.submit()', :name => 'search[dimensions][]', :id => "search_dimensions_#{i}"}
       %>
   <% end %>
   <br/>
   <%= t :chart_type %>:
-  <%= form.radio_button 'display_type', DrilldownSearch::DisplayType::BAR, {:onChange => 'form.submit()'} %>
+  <%= form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::BAR, {:onChange => 'form.submit()'} %>
   <%= form.label :display_type_bar, t(:bar) %>
-  <%= form.radio_button 'display_type', DrilldownSearch::DisplayType::PIE, {:disabled => @search.dimensions.size >= 2, :onChange => 'form.submit()'} %>
+  <%= form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::PIE, {:disabled => @search.dimensions.size >= 2, :onChange => 'form.submit()'} %>
   <%= form.label :display_type_pie, t(:pie) %>
-  <%= form.radio_button 'display_type', DrilldownSearch::DisplayType::LINE, {:onChange => 'form.submit()'} %>
+  <%= form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::LINE, {:onChange => 'form.submit()'} %>
   <%= form.label :display_type_line, t(:line) %>
-  <%= form.radio_button 'display_type', DrilldownSearch::DisplayType::NONE, {:onChange => 'form.submit()'} %>
+  <%= form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::NONE, {:onChange => 'form.submit()'} %>
   <%= form.label :display_type_none, t(:none) %>
 
   <%= form.check_box :order_by_value, {:onChange => 'form.submit()'} %>

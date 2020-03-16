@@ -3,7 +3,7 @@
   <%= form.text_field :title, class: 'form-control' %>
 </div>
 
-<% choices = java.util.concurrent.ConcurrentHashMap.new %>
+<% choices = Concurrent::Hash.new %>
 <% threads = @dimension_defs.keys.map do |dimension_name| %>
     <% dimension = @dimension_defs[dimension_name] %>
     <% t = Thread.start do |thread| %>
@@ -15,6 +15,6 @@
 <% end %>
 <% threads.each do |t, dimension_name| %>
     <% t.join %>
-    <%= render partial: 'field', locals: {choices: choices[dimension_name] || [],
+    <%= render partial: 'drilldown/field', locals: {choices: choices[dimension_name] || [],
             form: form, dimension_name: dimension_name} %>
 <% end %>

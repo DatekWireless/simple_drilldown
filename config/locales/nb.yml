@@ -1,0 +1,20 @@
+nb:
+  all: Alle
+  bar: Stolper
+  chart_type: Graftype
+  count: Antall
+  fields: Felt
+  filter: Filter
+  from_date: Fra dato
+  group_by: Grupper på
+  line: Linje
+  list: Liste
+  none: Ingen
+  order_by_value: Sorter på verdi
+  pie: Pai
+  reset: Nullstill
+  search: Søk
+  show: Vis
+  then_by: så på
+  title: Tittel
+  to_date: Til dato

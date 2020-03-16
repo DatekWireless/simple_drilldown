@@ -1,5 +1,9 @@
+require 'active_model/naming'
+
 module SimpleDrilldown
   class Search
+    extend ActiveModel::Naming
+
     module DisplayType
       BAR = 'BAR'
       LINE = 'LINE'
@@ -17,13 +21,14 @@ module SimpleDrilldown
     attr_reader :fields
     attr_reader :filter
     attr_accessor :list
+    attr_accessor :percent
     attr_reader :last_change_time
     attr_reader :order_by_value
     attr_reader :select_value
     attr_reader :title
     attr_reader :default_fields
 
-    def initialize(attributes_or_search, default_fields = nil)
+    def initialize(attributes_or_search, default_fields = nil, default_select_value = nil)
       if attributes_or_search.is_a? Search
         s = attributes_or_search
         @dimensions = s.dimensions.dup
@@ -31,6 +36,7 @@ module SimpleDrilldown
         @fields = s.fields.dup
         @filter = s.filter.dup
         @list = s.list
+        @percent = s.percent
         @last_change_time = s.last_change_time
         @order_by_value = s.order_by_value
         @select_value = s.select_value.dup
@@ -52,6 +58,7 @@ module SimpleDrilldown
         @order_by_value = attributes && (attributes[:order_by_value] == '1')
         @select_value = attributes && attributes[:select_value] && attributes[:select_value].size > 0 ? attributes[:select_value] : SelectValue::COUNT
         @list = attributes && attributes[:list] && attributes[:list] == '1' || false
+        @percent = attributes&.[](:percent) == '1'
         @last_change_time = attributes && attributes[:last_change_time] && attributes[:last_change_time] == '1' || false
         if (attributes && attributes[:fields])
           if attributes[:fields].is_a?(Array)
@@ -73,6 +80,7 @@ module SimpleDrilldown
               :list => list ? '1' : '0',
               :last_change_time => last_change_time ? '1' : '0',
               :filter => filter,
+              percent: percent ? '1' : '0',
               :dimensions => dimensions,
               :display_type => display_type,
           }
@@ -94,5 +102,8 @@ module SimpleDrilldown
       s
     end
 
+    def to_key
+      url_options.to_a
+    end
   end
 end

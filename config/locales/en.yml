@@ -1,0 +1,23 @@
+en:
+  all: All
+  bar: Bar
+  chart_type: Chart type
+  count: Count
+  fields: Fields
+  filter: Filter
+  from_date: From date
+  group_by: Group by
+  line: Line
+  list: List
+  none: None
+  order_by_value: Order by value
+  pie: Pie
+  reset: Reset
+  search: Search
+  show: Show
+  then_by: then by
+  title: Title
+  to_date: To date
+
+
+
