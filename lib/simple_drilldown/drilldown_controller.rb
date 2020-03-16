@@ -398,7 +398,7 @@ module SimpleDrilldown
     private
 
     def new_search_object
-      SimpleDrilldown::Search.new(params[:search].to_unsafe_h, @default_fields, @default_select_value)
+      SimpleDrilldown::Search.new(params[:search]&.to_unsafe_h, @default_fields, @default_select_value)
     end
 
     def remove_duplicates(result)
