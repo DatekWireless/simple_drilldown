@@ -6,7 +6,7 @@ nb:
   fields: Felt
   filter: Filter
   from_date: Fra dato
-  group_by: Grupper på
+  group_by: Gruppér på
   line: Linje
   list: Liste
   none: Ingen
