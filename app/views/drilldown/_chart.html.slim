@@ -16,7 +16,7 @@ ruby:
           end
 - case @search.display_type
 - when SimpleDrilldown::Search::DisplayType::PIE
-  = pie_chart @chart_data, height: '24rem'
+  = pie_chart data, height: '24rem'
 - when SimpleDrilldown::Search::DisplayType::BAR
   = column_chart data, height: '24rem'
 - when SimpleDrilldown::Search::DisplayType::LINE
