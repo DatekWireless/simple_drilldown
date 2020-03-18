@@ -1,39 +1,39 @@
 <% dimension = @dimension_defs[dimension_name] %>
 <% if dimension_name == 'calendar_date' %>
-    <% dates = [*@search.filter[dimension_name]] %>
-    <tr>
-      <td align="right" valign="top">
-        <%= form.label "filter[calendar_date]", t(:from_date) %>
-      </td>
-      <td>
-        <input type="text" data-behaviour="datepicker" id="search_filter[from_<%=dimension_name%>]"
-               name="search[filter][<%=dimension_name%>][]" class="form-control" value="<%=dates[0]%>"
-               placeholder="yyyy-mm-dd"/>
-      </td>
-    </tr>
-    <tr>
-      <td align="right" valign="top">
-        <%= form.label "filter[calendar_date]", t(:to_date) %>
-      </td>
-      <td>
-        <input type="text" data-behaviour="datepicker" id="search_filter[to_<%=dimension_name%>]"
-               name="search[filter][<%=dimension_name%>][]" class="form-control" value="<%=dates[1] || dates[0]%>"
-               placeholder="yyyy-mm-dd"/>
-      </td>
-    </tr>
+  <% dates = [*@search.filter[dimension_name]] %>
+  <tr>
+    <td align="right" valign="top">
+      <%= form.label "filter[calendar_date]", t(:from_date) %>
+    </td>
+    <td>
+      <input type="text" data-behaviour="datepicker" id="search_filter[from_<%= dimension_name %>]"
+             name="search[filter][<%= dimension_name %>][]" class="form-control" value="<%= dates[0] %>"
+             placeholder="yyyy-mm-dd"/>
+    </td>
+  </tr>
+  <tr>
+    <td align="right" valign="top">
+      <%= form.label "filter[calendar_date]", t(:to_date) %>
+    </td>
+    <td>
+      <input type="text" data-behaviour="datepicker" id="search_filter[to_<%= dimension_name %>]"
+             name="search[filter][<%= dimension_name %>][]" class="form-control" value="<%= dates[1] || dates[0] %>"
+             placeholder="yyyy-mm-dd"/>
+    </td>
+  </tr>
 <% else %>
-    <div class="form-group">
-      <%= form.label "filter[#{dimension_name}]", t(dimension_name) %>
-      <%= select :search, :filter,
-              choices,
-              {:selected => @search.filter[dimension_name]},
-              {
-                      id: "search_filter[#{dimension_name}]",
-                      name: "search[filter][#{dimension_name}][]",
-                      size: 5,
-                      multiple: true,
-                      class: 'form-control chosen',
-              }
-      %>
-    </div>
+  <div class="form-group">
+    <%= form.label "filter[#{dimension_name}]", t(dimension_name) %>
+    <%= select :search, :filter,
+        choices,
+        { :selected => @search.filter[dimension_name] },
+        {
+            id: "search_filter[#{dimension_name}]",
+            name: "search[filter][#{dimension_name}][]",
+            size: 5,
+            multiple: true,
+            class: 'form-control custom-select chosen',
+        }
+    %>
+  </div>
 <% end %>
