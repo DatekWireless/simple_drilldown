@@ -27,14 +27,15 @@ class <%= class_name %>DrilldownController < DrilldownController
   # field :comments, attr_method: ->(post) { post.comments.count }
 
   dimension :calendar_date, 'DATE(<%= plural_name %>.created_at)', interval: true
-  dimension :day_of_month, "date_part('day', <%= plural_name %>.created_at)"
-  dimension :day_of_week, "CASE WHEN date_part('dow', <%= plural_name %>.created_at) = 0 THEN 7 ELSE date_part('dow', <%= plural_name %>.created_at) END",
-            label_method: ->(day_no) { Date::DAYNAMES[day_no.to_i % 7] }
-  dimension :hour_of_day, "date_part('hour', <%= plural_name %>.created_at)"
-  dimension :month, "date_part('month', <%= plural_name %>.created_at)",
+  dimension :day_of_month, "date_part('day', <%= plural_name %>.created_at)::int"
+  dimension :day_of_week, <<~SQL, label_method: ->(day_no) { Date::DAYNAMES[day_no.to_i % 7] }
+    CASE WHEN date_part('dow', <%= plural_name %>.created_at) = 0 THEN 7 ELSE date_part('dow', <%= plural_name %>.created_at)::int END
+  SQL
+  dimension :hour_of_day, "date_part('hour', <%= plural_name %>.created_at)::int"
+  dimension :month, "date_part('month', <%= plural_name %>.created_at)::int",
             label_method: ->(month_no) { Date::MONTHNAMES[month_no.to_i] }
-  dimension :week, "date_part('week', <%= plural_name %>.created_at)"
-  dimension :year, "date_part('year', <%= plural_name %>.created_at)"
+  dimension :week, "date_part('week', <%= plural_name %>.created_at)::int"
+  dimension :year, "date_part('year', <%= plural_name %>.created_at)::varchar"
 
   # dimension :comments, 'SELECT count(*) FROM comments c WHERE c.<%= singular_name %>_id = <%= plural_name %>.id'
   # dimension :user, 'users.name', includes: :user
