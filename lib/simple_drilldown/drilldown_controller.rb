@@ -302,11 +302,11 @@ module SimpleDrilldown
       includes.keep_if(&:present?).uniq!
       if @search.order_by_value && @dimensions.size <= 1
         order = case @search.select_value
-                when DrilldownSearch::SelectValue::VOLUME
+                when Search::SelectValue::VOLUME
                   'volume DESC'
-                when DrilldownSearch::SelectValue::VOLUME_COMPENSATED
+                when Search::SelectValue::VOLUME_COMPENSATED
                   'volume_compensated DESC'
-                when DrilldownSearch::SelectValue::COUNT
+                when Search::SelectValue::COUNT
                   'count DESC'
                 else
                   'count DESC'
