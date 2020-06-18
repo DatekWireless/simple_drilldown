@@ -2,4 +2,5 @@
 
 Rails.application.routes.draw do
   mount SimpleDrilldown::Engine => '/simple_drilldown'
+  resources :users
 end

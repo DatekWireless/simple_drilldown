@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module SimpleDrilldown
+  # Routing helper methods
   module Routing
     def draw_drilldown(path, controller = path)
       get "#{path}(.:format)" => "#{controller}#index", as: path

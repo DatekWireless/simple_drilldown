@@ -4,9 +4,9 @@
 <img align="right" src="https://travis-ci.org/DatekWireless/simple_drilldown.svg?branch=master" alt="Build Status">
 </a>
 
-simple_drilldown offers a simple way to define axis to filter and group records
+`simple_drilldown` offers a simple way to define axis to filter and group records
 for analysis.  The result is a record count for the selected filter and
-distribution and the option to list the actual records.
+distribution and the option to list and export the actual records.
 
 ## Usage
 
