@@ -1,0 +1,11 @@
+one:
+  title: MyString
+  body: MyText
+  user: one
+  published_at: 2020-06-20 08:25:40
+
+two:
+  title: MyString
+  body: MyText
+  user: two
+  published_at: 2020-06-20 08:25:40
