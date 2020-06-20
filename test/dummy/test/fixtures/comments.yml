@@ -1,0 +1,11 @@
+one:
+  post: one
+  title: MyString
+  body: 
+  rating: 1
+
+two:
+  post: two
+  title: MyString
+  body: 
+  rating: 1

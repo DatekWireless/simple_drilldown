@@ -16,6 +16,10 @@ For a given schema:
 
 ```ruby
 ActiveRecord::Schema.define(version: 20141204155251) do
+  create_table "users" do |t|
+    t.string "name",   limit: 16, null: false
+  end
+
   create_table "posts" do |t|
     t.string   "title",      null: false
     t.text     "body",       null: false
@@ -23,10 +27,6 @@ ActiveRecord::Schema.define(version: 20141204155251) do
     t.datetime "published_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "users" do |t|
-    t.string "name",   limit: 16, null: false
   end
 
   create_table "comments" do |t|
