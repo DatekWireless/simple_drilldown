@@ -31,6 +31,7 @@ ActiveRecord::Schema.define(version: 20141204155251) do
 
   create_table "comments" do |t|
     t.integer  "post_id", null: false
+    t.integer  "user_id",    null: false
     t.string   "title",   null: false
     t.text     "body",    null: false
     t.integer  "rating",  null: false

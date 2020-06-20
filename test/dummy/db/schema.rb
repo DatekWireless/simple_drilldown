@@ -12,15 +12,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20_200_620_064_453) do
+ActiveRecord::Schema.define(version: 20_200_620_065_126) do
   create_table 'comments', force: :cascade do |t|
     t.integer 'post_id', null: false
+    t.integer 'user_id', null: false
     t.string 'title', null: false
     t.text 'body', null: false
     t.integer 'rating', null: false
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
     t.index ['post_id'], name: 'index_comments_on_post_id'
+    t.index ['user_id'], name: 'index_comments_on_user_id'
   end
 
   create_table 'posts', force: :cascade do |t|
@@ -40,5 +42,6 @@ ActiveRecord::Schema.define(version: 20_200_620_064_453) do
   end
 
   add_foreign_key 'comments', 'posts'
+  add_foreign_key 'comments', 'users'
   add_foreign_key 'posts', 'users'
 end

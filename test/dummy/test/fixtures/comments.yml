@@ -1,11 +1,13 @@
 one:
   post: one
+  user: one
   title: MyString
   body: 
   rating: 1
 
 two:
   post: two
+  user: two
   title: MyString
   body: 
   rating: 1
