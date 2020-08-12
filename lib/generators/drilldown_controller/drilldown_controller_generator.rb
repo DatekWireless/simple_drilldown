@@ -5,6 +5,7 @@ class DrilldownControllerGenerator < Rails::Generators::NamedBase
 
   def copy_drilldown_controller_file
     template 'drilldown_controller.rb.erb', "app/controllers/#{file_name}_drilldown_controller.rb"
-    route "resources(:#{singular_name}_drilldown, only: :index){collection{get :excel_export;get :html_export}}"
+    template 'drilldown_controller_test.rb.erb', "test/controllers/#{file_name}_drilldown_controller_test.rb"
+    route "draw_drilldown :#{singular_name}_drilldown"
   end
 end

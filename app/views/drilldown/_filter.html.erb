@@ -4,17 +4,8 @@
 </div>
 
 <% choices = Concurrent::Hash.new %>
-<% threads = @dimension_defs.keys.map do |dimension_name| %>
-    <% dimension = @dimension_defs[dimension_name] %>
-    <% t = Thread.start do |thread| %>
-        <% ActiveRecord::Base.connection_pool.with_connection do %>
-            <% choices[dimension_name] = [[t(:all), nil]] + (dimension[:legal_values] && dimension[:legal_values].call(@search).map { |o| o.is_a?(Array) ? [o[0].to_s, o[1].to_s] : o.to_s } || []) %>
-        <% end %>
-    <% end %>
-    <% next [t, dimension_name] %>
-<% end %>
-<% threads.each do |t, dimension_name| %>
-    <% t.join %>
-    <%= render partial: 'drilldown/field', locals: {choices: choices[dimension_name] || [],
-            form: form, dimension_name: dimension_name} %>
+<% controller.c_dimension_defs.each do |dimension_name, dimension| %>
+  <% choices[dimension_name] = [[t(:all), nil]] + (dimension[:legal_values] && dimension[:legal_values].call(@search).map { |o| o.is_a?(Array) ? [o[0].to_s, o[1].to_s] : o.to_s } || []) %>
+  <%= render partial: 'drilldown/field', locals: { choices: choices[dimension_name] || [],
+      form: form, dimension_name: dimension_name } %>
 <% end %>

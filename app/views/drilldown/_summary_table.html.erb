@@ -3,8 +3,8 @@
   <% @dimensions.each do |d| %>
     <th><%=h d[:pretty_name]%></th>
   <% end %>
-  <th><%= t @target_class.table_name.capitalize %></th>
-  <%= @summary_fields.map{|l| "<th>#{t(l)}</th>"}.join("\n").html_safe %>
+  <th><%= t controller.c_target_class.table_name.capitalize %></th>
+  <%= controller.c_summary_fields.map{|l| "<th>#{t(l)}</th>"}.join("\n").html_safe %>
 </tr>
 
 <%=summary_row(@result) %>

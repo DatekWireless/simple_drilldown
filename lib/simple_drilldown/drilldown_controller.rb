@@ -9,46 +9,63 @@ module SimpleDrilldown
 
     LIST_LIMIT = 10_000
 
+    class_attribute :c_base_condition, default: '1=1'
+    class_attribute :c_base_group, default: []
+    class_attribute :c_base_includes, default: []
+    class_attribute :c_default_fields, default: []
+    class_attribute :c_default_select_value, default: SimpleDrilldown::Search::SelectValue::COUNT
+    class_attribute :c_dimension_defs, default: Concurrent::Hash.new
+    class_attribute :c_fields, default: {}
+    class_attribute :c_list_includes, default: []
+    class_attribute :c_list_order
+    class_attribute :c_select, default: 'count(*) as count'
+    class_attribute :c_summary_fields, default: []
+    class_attribute :c_target_class
+
     class << self
+      def inherited(base)
+        super
+        base.c_target_class = base.name.chomp('DrilldownController').constantize
+      end
+
       def base_condition(base_condition)
-        @@base_condition = base_condition
+        self.c_base_condition = base_condition
       end
 
       def base_includes(base_includes)
-        @@base_includes = base_includes
+        self.c_base_includes = base_includes
       end
 
       def base_group(base_group)
-        @@base_group = base_group
+        self.c_base_group = base_group
       end
 
-      def default_fields(fields)
-        @@default_fields = fields
+      def default_fields(default_fields)
+        self.c_default_fields = default_fields
       end
 
       def target_class(target_class)
-        @@target_class = target_class
+        self.c_target_class = target_class
       end
 
       def select(select)
-        @@select = select
+        self.c_select = select
       end
 
       def list_includes(list_includes)
-        @@list_includes = list_includes
+        self.c_list_includes = list_includes
       end
 
       def list_order(list_order)
-        @@list_order = list_order
+        self.c_list_order = list_order
       end
 
       def field(name, **options)
-        @@fields ||= {}
-        @@fields[name] = options
+        c_fields[name] = options
       end
 
       def summary_fields(*summary_fields)
-        @@summary_fields = summary_fields
+        self.c_summary_fields = summary_fields
       end
 
       def dimension(name, select_expression = name, options = {})
@@ -74,9 +91,7 @@ module SimpleDrilldown
           raise "Unknown options: #{query_opts.keys.inspect}" unless (query_opts.keys - %i[select includes where]).empty?
         end
 
-        @@dimension_defs ||= Concurrent::Hash.new
-
-        @@dimension_defs[name.to_s] = {
+        c_dimension_defs[name.to_s] = {
           includes: queries.inject([]) do |a, e|
             i = e[:includes]
             next a unless i
@@ -101,7 +116,7 @@ module SimpleDrilldown
           my_filter = search.filter.dup
           my_filter.delete(field.to_s) unless preserve_filter
           filter_conditions, _t, includes = make_conditions(my_filter)
-          dimension_def = @@dimension_defs[field.to_s]
+          dimension_def = c_dimension_defs[field.to_s]
           result_sets = dimension_def[:queries].map do |query|
             if query[:includes]
               if query[:includes].is_a?(Array)
@@ -111,11 +126,11 @@ module SimpleDrilldown
               end
               includes.uniq!
             end
-            rows = @@target_class.unscoped.where(@@base_condition)
+            rows = c_target_class.unscoped.where(c_base_condition)
                                  .select("#{query[:select]} AS value")
-                                 .where(filter_conditions)
-                                 .where(query[:where])
-                                 .joins(make_join([], @@target_class.name.underscore.to_sym, includes))
+                                 .where(filter_conditions || '1=1')
+                                 .where(query[:where] || '1=1')
+                                 .joins(make_join([], c_target_class.name.underscore.to_sym, includes))
                                  .order('value')
                                  .group(:value)
                                  .to_a
@@ -137,14 +152,14 @@ module SimpleDrilldown
       end
 
       def make_conditions(search_filter)
-        includes = @@base_includes.dup
+        includes = c_base_includes.dup
         if search_filter
           condition_strings = []
           condition_values = []
 
           filter_texts = []
           search_filter.each do |field, values|
-            dimension_def = @@dimension_defs[field]
+            dimension_def = c_dimension_defs[field]
             raise "Unknown filter field: #{field.inspect}" if dimension_def.nil?
 
             values = [*values]
@@ -254,24 +269,7 @@ module SimpleDrilldown
 
     def initialize
       super()
-      @fields = @@fields
-      @default_fields = @@default_fields
-      @default_select_value = SimpleDrilldown::Search::SelectValue::COUNT
-      @target_class = @@target_class
-      @select = @@select
-      @@base_condition = '1 = 1' unless defined?(@@base_condition)
-      @base_condition = @@base_condition
-      @@base_includes = [] unless defined?(@@base_includes)
-      @base_includes = @@base_includes
-      @base_group = defined?(@@base_group) ? @@base_group : []
-      @@list_includes = [] unless defined?(@@list_includes)
-      @list_includes = @@list_includes
-      @list_order = @@list_order
-      @dimension_defs = @@dimension_defs
-      @@summary_fields = [] unless defined?(@@summary_fields)
-      @summary_fields = @@summary_fields
-
-      @history_fields = @fields.select { |_k, v| v[:list_change_times] }.map { |k, _v| k.to_s }
+      @history_fields = c_fields.select { |_k, v| v[:list_change_times] }.map { |k, _v| k.to_s }
     end
 
     # ?dimension[0]=supplier&dimension[1]=transaction_type&
@@ -279,18 +277,17 @@ module SimpleDrilldown
     def index(do_render = true)
       @search = new_search_object
 
-      @transaction_fields = (@search.fields + (@fields.keys.map(&:to_s) - @search.fields))
-      @transaction_fields_map = @fields
+      @transaction_fields = (@search.fields + (c_fields.keys.map(&:to_s) - @search.fields))
 
-      select = @select.dup
-      includes = @base_includes.dup
+      select = c_select.dup
+      includes = c_base_includes.dup
 
       @dimensions = []
-      select << ", 'All'::text as value0"
+      select << ", 'All'#{'::text' if c_target_class.connection.adapter_name == 'PostgreSQL'} as value0"
       @dimensions += @search.dimensions.map do |dn|
-        raise "Unknown distribution field: #{dn.inspect}" if @dimension_defs[dn].nil?
+        raise "Unknown distribution field: #{dn.inspect}" if c_dimension_defs[dn].nil?
 
-        @dimension_defs[dn]
+        c_dimension_defs[dn]
       end
       @dimensions.each_with_index do |d, i|
         select << ", #{d[:select_expression]} as value#{i + 1}"
@@ -315,18 +312,18 @@ module SimpleDrilldown
         order = (1..@dimensions.size).map { |i| "value#{i}" }.join(',')
         order = nil if order.empty?
       end
-      group = (@base_group + (1..@dimensions.size).map { |i| "value#{i}" }).join(',')
+      group = (c_base_group + (1..@dimensions.size).map { |i| "value#{i}" }).join(',')
       group = nil if group.empty?
 
-      joins = self.class.make_join([], @target_class.name.underscore.to_sym, includes)
-      rows = @target_class.unscoped.where(@base_condition).select(select).where(conditions)
-                          .joins(joins)
-                          .group(group)
-                          .order(order).to_a
+      joins = self.class.make_join([], c_target_class.name.underscore.to_sym, includes)
+      rows = c_target_class.unscoped.where(c_base_condition).select(select).where(conditions)
+                           .joins(joins)
+                           .group(group)
+                           .order(order).to_a
 
       if rows.empty?
         @result = { value: 'All', count: 0, row_count: 0, nodes: 0, rows: [] }
-        @summary_fields.each { |f| @result[f] = 0 }
+        c_summary_fields.each { |f| @result[f] = 0 }
       else
         if do_render && @search.list && rows.inject(0) { |sum, r| sum + r[:count].to_i } > LIST_LIMIT
           @search.list = false
@@ -335,9 +332,9 @@ module SimpleDrilldown
         @result = result_from_rows(rows, 0, 0, ['All'])
       end
 
-      remove_duplicates(@result) unless @base_group.empty?
+      remove_duplicates(@result) unless c_base_group.empty?
 
-      @remaining_dimensions = @dimension_defs.dup
+      @remaining_dimensions = c_dimension_defs.dup
       @remaining_dimensions.each_key do |dim_name|
         if (@search.filter[dim_name] && @search.filter[dim_name].size == 1) ||
            (@dimensions.any? { |d| d[:url_param_name] == dim_name })
@@ -352,9 +349,9 @@ module SimpleDrilldown
     def choices
       @search = new_search_object
       dimension_name = params[:dimension_name]
-      dimension = @dimension_defs[dimension_name]
+      dimension = c_dimension_defs[dimension_name]
       selected = @search.filter[dimension_name] || []
-      raise "Unknown dimension #{dimension_name.inspect}: #{@dimension_defs.keys.inspect}" unless dimension
+      raise "Unknown dimension #{dimension_name.inspect}: #{c_dimension_defs.keys.inspect}" unless dimension
 
       choices = [[t(:all), nil]] +
                 (dimension[:legal_values]&.call(@search)&.map { |o| o.is_a?(Array) ? o[0..1].map(&:to_s) : o.to_s } || [])
@@ -398,7 +395,7 @@ module SimpleDrilldown
     private
 
     def new_search_object
-      SimpleDrilldown::Search.new(params[:search]&.to_unsafe_h, @default_fields, @default_select_value)
+      SimpleDrilldown::Search.new(params[:search]&.to_unsafe_h, c_default_fields, c_default_select_value)
     end
 
     def remove_duplicates(result)
@@ -411,7 +408,7 @@ module SimpleDrilldown
         if prev_row
           if prev_row[:value] == r[:value]
             prev_row[:count] += r[:count]
-            @summary_fields.each do |f|
+            c_summary_fields.each do |f|
               prev_row[f] += r[f]
             end
             prev_row[:row_count] = [prev_row[:row_count], r[:row_count]].max
@@ -449,7 +446,7 @@ module SimpleDrilldown
             row_count: 0,
             nodes: 0
           }
-          @summary_fields.each { |f| sub_result[f] = 0 }
+          c_summary_fields.each { |f| sub_result[f] = 0 }
           sub_result[:rows] = add_zero_results([], dimension + 1) if dimension < @dimensions.size - 1
           result_rows << sub_result
         end
@@ -472,7 +469,7 @@ module SimpleDrilldown
           row_count: 1,
           nodes: @search.list ? 2 : 1
         }
-        @summary_fields.each { |f| result[f] = row[f].to_i }
+        c_summary_fields.each { |f| result[f] = row[f].to_i }
         return result
       end
 
@@ -495,7 +492,7 @@ module SimpleDrilldown
         nodes: result_rows.inject(0) { |t, r| t + r[:nodes] } + 1,
         rows: result_rows
       }
-      @summary_fields.each { |f| result[f] = result_rows.inject(0) { |t, r| t + r[f] } }
+      c_summary_fields.each { |f| result[f] = result_rows.inject(0) { |t, r| t + r[f] } }
       result
     end
 
@@ -505,9 +502,9 @@ module SimpleDrilldown
           populate_list(conditions, includes, r, values + [r[:value]])
         end
       else
-        list_includes = includes + @list_includes
+        list_includes = includes + c_list_includes
         @search.fields.each do |field|
-          field_def = @transaction_fields_map[field.to_sym]
+          field_def = c_fields[field.to_sym]
           raise "Field definition missing for: #{field.inspect}" unless field_def
 
           field_includes = field_def[:include]
@@ -521,9 +518,9 @@ module SimpleDrilldown
             list_includes << { assignment: { order: :"#{f}_changes" } } if @search.fields.include? f
           end
         end
-        joins = self.class.make_join([], @target_class.name.underscore.to_sym, list_includes)
+        joins = self.class.make_join([], c_target_class.name.underscore.to_sym, list_includes)
         list_conditions = list_conditions(conditions, values)
-        base_query = @target_class.unscoped.where(@base_condition).joins(joins).order(@list_order)
+        base_query = c_target_class.unscoped.where(c_base_condition).joins(joins).order(@list_order)
         base_query = base_query.where(list_conditions) if list_conditions
         result[:transactions] = base_query.to_a
       end

@@ -66,6 +66,8 @@ end
 Create a new controller to focus on posts.  Each drilldown controller focuses on
 one main entity.
 
+    bin/rails g drilldown_controller User
+
 ```ruby
 class PostsDrilldownController < DrilldownController
 

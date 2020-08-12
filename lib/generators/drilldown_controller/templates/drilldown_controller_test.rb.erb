@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+require 'test_helper'
+
+class <%= class_name %>DrilldownControllerTest < ActionDispatch::IntegrationTest
+  test 'should get index' do
+    get <%= singular_name %>_drilldown_url
+    assert_response :success
+  end
+
+  test 'should get index with list' do
+    get <%= singular_name %>_drilldown_url search: { list: 1 }
+    assert_response :success
+  end
+end

@@ -45,7 +45,7 @@ xml.Workbook(
       @transactions.each do |transaction|
         xml.Row do
           @transaction_fields.each do |field|
-            field_map = @transaction_fields_map[field.to_sym]
+            field_map = controller.c_fields[field.to_sym]
             if field == 'time'
               xml.Cell 'ss:StyleID' => 'DateOnlyFormat' do
                 xml.Data transaction.completed_at.gmtime.xmlschema, 'ss:Type' => 'DateTime'

@@ -1,14 +1,23 @@
 # frozen_string_literal: true
 
-class <%= class_name %>DrilldownController < DrilldownController
-  # What fields should be displayed as default when listing actual <%= class_name %> records.
-  default_fields %w[created_at updated_at] # TODO(uwe): Read fields from schema?
+require 'simple_drilldown/drilldown_controller'
 
+class <%= class_name %>DrilldownController < SimpleDrilldown::DrilldownController
   # The main focus of the drilldown
-  target_class <%= class_name %>
+  # target_class <%= class_name %>
+
+  # `where` clause for the base line
+  # base_condition '1=1'
 
   # How should we count the reords?
-  select 'count(*) as count'
+  # select 'count(*) as count'
+
+  # When selecting records, what relations should be included for optimization?
+  # Other relations can be included for specific dimensions and fields.
+  # base_includes :user, :comments # TODO(uwe): Read relations from schema?
+
+  # What fields should be displayed as default when listing actual <%= class_name %> records.
+  default_fields %w[created_at updated_at] # TODO(uwe): Read fields from schema?
 
   # When listing records, what relations should be included for optimization?
   # list_includes :user, :comments # TODO(uwe): Read relations from schema?
