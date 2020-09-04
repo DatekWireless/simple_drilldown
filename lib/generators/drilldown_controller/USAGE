@@ -6,3 +6,4 @@ Example:
 
     This will create:
         app/controllers/thing_drilldown_controller.rb
+        test/controllers/thing_drilldown_controller_test.rb
