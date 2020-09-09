@@ -2,8 +2,7 @@
 
 module SimpleDrilldown
   # View helper for SimpleDrilldown
-  # FIXME(uwe): Rename to Helper
-  module DrilldownHelper
+  module Helper
     def value_label(dimension_index, value)
       dimension = @dimensions[dimension_index]
       return nil if dimension.nil?

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'simple_drilldown/drilldown_helper'
+require 'simple_drilldown/helper'
 require 'simple_drilldown/search'
 
 module SimpleDrilldown
   class Controller < ::ApplicationController
-    helper DrilldownHelper
+    helper Helper
 
     LIST_LIMIT = 10_000
 
