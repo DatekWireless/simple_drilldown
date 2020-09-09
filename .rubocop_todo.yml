@@ -67,7 +67,7 @@ Style/ClassAndModuleChildren:
 # Offense count: 15
 Style/ClassVars:
   Exclude:
-    - 'lib/simple_drilldown/drilldown_controller.rb'
+    - 'lib/simple_drilldown/controller.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -88,7 +88,7 @@ Style/Documentation:
     - 'app/models/simple_drilldown/application_record.rb'
     - 'lib/generators/drilldown_controller/drilldown_controller_generator.rb'
     - 'lib/simple_drilldown.rb'
-    - 'lib/simple_drilldown/drilldown_controller.rb'
+    - 'lib/simple_drilldown/controller.rb'
     - 'lib/simple_drilldown/engine.rb'
     - 'lib/simple_drilldown/search.rb'
 
@@ -130,7 +130,7 @@ Style/NumericPredicate:
 # Cop supports --auto-correct.
 Style/SlicingWithRange:
   Exclude:
-    - 'lib/simple_drilldown/drilldown_controller.rb'
+    - 'lib/simple_drilldown/controller.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.

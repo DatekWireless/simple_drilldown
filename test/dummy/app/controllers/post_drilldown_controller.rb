@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-class PostDrilldownController < SimpleDrilldown::DrilldownController
+class PostDrilldownController < SimpleDrilldown::Controller
 end

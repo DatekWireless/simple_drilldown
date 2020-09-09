@@ -4,7 +4,7 @@ require 'simple_drilldown/drilldown_helper'
 require 'simple_drilldown/search'
 
 module SimpleDrilldown
-  class DrilldownController < ::ApplicationController
+  class Controller < ::ApplicationController
     helper DrilldownHelper
 
     LIST_LIMIT = 10_000
@@ -14,8 +14,8 @@ module SimpleDrilldown
     class_attribute :c_base_includes, default: []
     class_attribute :c_default_fields, default: []
     class_attribute :c_default_select_value, default: SimpleDrilldown::Search::SelectValue::COUNT
-    class_attribute :c_dimension_defs, default: Concurrent::Hash.new
-    class_attribute :c_fields, default: {}
+    class_attribute :c_dimension_defs
+    class_attribute :c_fields
     class_attribute :c_list_includes, default: []
     class_attribute :c_list_order
     class_attribute :c_select, default: 'count(*) as count'
@@ -25,7 +25,16 @@ module SimpleDrilldown
     class << self
       def inherited(base)
         super
-        base.c_target_class = base.name.chomp('DrilldownController').constantize
+        base.c_dimension_defs = Concurrent::Hash.new
+        base.c_fields = {}
+        begin
+          base.c_target_class = base.name.chomp('DrilldownController').constantize
+        rescue NameError
+          begin
+            base.c_target_class = base.name.chomp('Controller').constantize
+          rescue NameError
+          end
+        end
       end
 
       def base_condition(base_condition)
@@ -41,7 +50,11 @@ module SimpleDrilldown
       end
 
       def default_fields(default_fields)
-        self.c_default_fields = default_fields
+        self.c_default_fields = default_fields.flatten
+      end
+
+      def default_select_value(default_select_value)
+        self.c_default_select_value = default_select_value
       end
 
       def target_class(target_class)
@@ -53,7 +66,7 @@ module SimpleDrilldown
       end
 
       def list_includes(list_includes)
-        self.c_list_includes = list_includes
+        self.c_list_includes = list_includes.flatten
       end
 
       def list_order(list_order)
@@ -65,7 +78,7 @@ module SimpleDrilldown
       end
 
       def summary_fields(*summary_fields)
-        self.c_summary_fields = summary_fields
+        self.c_summary_fields = summary_fields.flatten
       end
 
       def dimension(name, select_expression = name, options = {})
@@ -92,12 +105,19 @@ module SimpleDrilldown
         end
 
         c_dimension_defs[name.to_s] = {
-          includes: queries.inject([]) do |a, e|
+          includes: queries.inject(nil) do |a, e|
             i = e[:includes]
             next a unless i
-            next a if a.include?(i)
+            next a if a&.include?(i)
 
-            a + [i]
+            case a
+            when nil
+              i
+            when Symbol
+              [a, *i]
+            else
+              a.concat(*i)
+            end
           end,
           interval: interval,
           label_method: label_method,
@@ -217,9 +237,9 @@ module SimpleDrilldown
         when Hash
           sql = +''
           include.each do |parent, child|
-            sql << make_join(joins, model, parent) + ' '
+            sql << ' ' + make_join(joins, model, parent)
             ass = model.to_s.camelize.constantize.reflect_on_association parent
-            sql << make_join(joins, parent, child, ass.class_name.constantize)
+            sql << ' ' + make_join(joins, parent, child, ass.class_name.constantize)
           end
           sql
         when Symbol
@@ -498,31 +518,69 @@ module SimpleDrilldown
 
     def populate_list(conditions, includes, result, values)
       if result[:rows]
-        result[:rows].each do |r|
-          populate_list(conditions, includes, r, values + [r[:value]])
-        end
-      else
-        list_includes = includes + c_list_includes
-        @search.fields.each do |field|
-          field_def = c_fields[field.to_sym]
-          raise "Field definition missing for: #{field.inspect}" unless field_def
+        return result[:rows].each { |r| populate_list(conditions, includes, r, values + [r[:value]]) }
+      end
+      list_includes = merge_includes(includes, c_list_includes)
+      @search.fields.each do |field|
+        field_def = c_fields[field.to_sym]
+        raise "Field definition missing for: #{field.inspect}" unless field_def
 
-          field_includes = field_def[:include]
-          if field_includes
-            list_includes += field_includes.is_a?(Array) ? field_includes : [field_includes]
+        field_includes = field_def[:include]
+        if field_includes
+          list_includes = merge_includes(list_includes , field_includes)
+        end
+      end
+      if @search.list_change_times
+        @history_fields.each do |f|
+          if @search.fields.include? f
+            list_includes = merge_includes(list_includes, assignment: { order: :"#{f}_changes" } )
           end
         end
-        list_includes.uniq!
-        if @search.list_change_times
-          @history_fields.each do |f|
-            list_includes << { assignment: { order: :"#{f}_changes" } } if @search.fields.include? f
-          end
+      end
+      joins = self.class.make_join([], c_target_class.name.underscore.to_sym, list_includes)
+      list_conditions = list_conditions(conditions, values)
+      base_query = c_target_class.unscoped.where(c_base_condition).joins(joins).order(@list_order)
+      base_query = base_query.where(list_conditions) if list_conditions
+      result[:transactions] = base_query.to_a
+    end
+
+    def merge_includes(*args)
+      hash = hash_includes(*args)
+      result = hash.dup.map { |k, v|
+        if v.blank?
+          hash.delete(k)
+          k
         end
-        joins = self.class.make_join([], c_target_class.name.underscore.to_sym, list_includes)
-        list_conditions = list_conditions(conditions, values)
-        base_query = c_target_class.unscoped.where(c_base_condition).joins(joins).order(@list_order)
-        base_query = base_query.where(list_conditions) if list_conditions
-        result[:transactions] = base_query.to_a
+      }.compact
+      result << hash unless hash.blank?
+      case result.size
+      when 0
+        nil
+      when 1
+        result[0]
+      else
+        result
+      end
+    end
+
+    def hash_includes(*args)
+      args.inject({}) do |h, inc|
+        case inc
+        when Array
+          inc.each { |v|
+            h = hash_includes(h, v)
+          }
+        when Hash
+          inc.each { |k, v|
+            h[k] = merge_includes(h[k], v)
+          }
+        when NilClass, FalseClass
+        when String, Symbol
+          h[inc] ||= []
+        else
+          raise "Unknown include type: #{inc.inspect}"
+        end
+        h
       end
     end
 

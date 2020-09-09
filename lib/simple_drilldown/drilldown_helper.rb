@@ -2,6 +2,7 @@
 
 module SimpleDrilldown
   # View helper for SimpleDrilldown
+  # FIXME(uwe): Rename to Helper
   module DrilldownHelper
     def value_label(dimension_index, value)
       dimension = @dimensions[dimension_index]
@@ -11,7 +12,7 @@ module SimpleDrilldown
     end
 
     def caption
-      result = @search.title || "#{@target_class} #{t(@search.select_value.downcase)}" +
+      result = @search.title || "#{controller.c_target_class} #{t(@search.select_value.downcase)}" +
                                 (@dimensions && @dimensions.any? ? ' by ' + @dimensions.map { |d| d[:pretty_name] }.join(' and ') : '')
       result.gsub('$date', [*@search.filter[:calendar_date]].uniq.join(' - '))
     end

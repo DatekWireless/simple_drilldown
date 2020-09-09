@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UserDrilldownController < SimpleDrilldown::DrilldownController
+class UserDrilldownController < SimpleDrilldown::Controller
   # What fields should be displayed as default when listing actual User records.
   default_fields %w[created_at updated_at] # TODO(uwe): Read fields from schema?
 

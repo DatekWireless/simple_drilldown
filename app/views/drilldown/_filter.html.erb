@@ -3,9 +3,8 @@
   <%= form.text_field :title, class: 'form-control' %>
 </div>
 
-<% choices = Concurrent::Hash.new %>
 <% controller.c_dimension_defs.each do |dimension_name, dimension| %>
-  <% choices[dimension_name] = [[t(:all), nil]] + (dimension[:legal_values] && dimension[:legal_values].call(@search).map { |o| o.is_a?(Array) ? [o[0].to_s, o[1].to_s] : o.to_s } || []) %>
-  <%= render partial: 'drilldown/field', locals: { choices: choices[dimension_name] || [],
+  <% choices = [[t(:all), nil]] + (dimension[:legal_values] && dimension[:legal_values].call(@search).map { |o| o.is_a?(Array) ? [o[0].to_s, o[1].to_s] : o.to_s } || []) %>
+  <%= render partial: 'drilldown/field', locals: { choices: choices || [],
       form: form, dimension_name: dimension_name } %>
 <% end %>
