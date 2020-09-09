@@ -539,7 +539,7 @@ module SimpleDrilldown
       end
       joins = self.class.make_join([], c_target_class.name.underscore.to_sym, list_includes)
       list_conditions = list_conditions(conditions, values)
-      base_query = c_target_class.unscoped.where(c_base_condition).joins(joins).order(@list_order)
+      base_query = c_target_class.unscoped.where(c_base_condition).joins(joins).order(c_list_order)
       base_query = base_query.where(list_conditions) if list_conditions
       result[:transactions] = base_query.to_a
     end
