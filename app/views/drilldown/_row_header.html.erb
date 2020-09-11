@@ -1,7 +1,7 @@
 <thead>
   <tr>
     <% @search.fields.each do |field| %>
-      <th><%=t field %></th>
+      <th><%=t field, default: :"attributes.#{field}" %></th>
     <% end %>
     <th></th>
   </tr>
