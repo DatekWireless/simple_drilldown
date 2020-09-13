@@ -122,7 +122,7 @@ module SimpleDrilldown
           interval: interval,
           label_method: label_method,
           legal_values: legal_values,
-          pretty_name: I18n.t(name),
+          pretty_name: I18n.t(name, default: :"activerecord.models.#{name}"),
           queries: queries,
           reverse: reverse,
           select_expression: queries.size > 1 ? "COALESCE(#{queries.map { |q| q[:select] }.join(',')})" : queries[0][:select],

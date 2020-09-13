@@ -22,7 +22,7 @@
   </tr>
 <% else %>
   <div class="form-group">
-    <%= form.label "filter[#{dimension_name}]", t(dimension_name) %>
+    <%= form.label "filter[#{dimension_name}]", t(dimension_name, default: :"activerecord.models.#{dimension_name}") %>
     <%= select :search, :filter,
         choices,
         { :selected => @search.filter[dimension_name] },
