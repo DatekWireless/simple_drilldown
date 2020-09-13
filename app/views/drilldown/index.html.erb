@@ -56,16 +56,16 @@
 
 <% end %> <!-- END  FORM -->
 
-<%=javascript_tag do %>
-form = document.getElementById("edit_search_SEARCH");
-form.submit = function() {
-    elements = form.elements;
-    params = new Array();
-    for (var el, i = 0; (el = elements[i] ); i++) {
-      if (el.type == "text" && el.value == "") {
+<%= javascript_tag do %>
+  form = document.getElementById("edit_search_SEARCH");
+  form.submit = function() {
+    let elements = form.elements;
+    let params = [];
+    for (let el, i = 0; (el = elements[i] ); i++) {
+      if (el.name === '' || (el.type === "text" && el.value === "")) {
         continue;
       }
-      if (el.type == "select-multiple") {
+      if (el.type === "select-multiple") {
         if (el.selectedIndex > 0) {
           for (var j = 0; j < el.options.length; j++) {
             // Ignore "All" and unselected options
@@ -76,28 +76,24 @@ form.submit = function() {
         }
         continue;
       }
-      if (el.type == "select-one" && el.selectedIndex == 0) {
+      if (el.type === "select-one" && el.selectedIndex === 0) {
         continue;
       }
-      if (el.type == "checkbox" && el.checked != true) {
+      if (el.type === "checkbox" && el.checked !== true) {
         continue;
       }
-      if (el.type == "radio" && el.checked != true) {
+      if (el.type === "radio" && (el.checked !== true || el.value === 'NONE')) {
         continue;
       }
-      if (el.type == "hidden" && (el.value == "0" || el.value == "")) {
+      if (el.type === "hidden" && (el.value === "0" || el.value === "")) {
         continue;
       }
-      if (el.type == "submit") {
+      if (el.type === "submit") {
         continue;
       }
       params.push("" + el.name + "=" + encodeURIComponent(el.value));
     }
     location = form.action + "?" + params.join('&');
     return false;
-};
-
-// $(document).ready(function () {
-//   $('[data-behaviour~=datepicker]').datepicker({format: "yyyy-mm-dd"});
-// })
+  };
 <% end %>
