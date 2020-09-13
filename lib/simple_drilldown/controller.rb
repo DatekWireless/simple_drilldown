@@ -389,26 +389,26 @@ module SimpleDrilldown
     def excel_export
       index(false)
       headers['Content-Type'] = 'application/vnd.ms-excel'
-      headers['Content-Disposition'] = 'attachment; filename="transactions.xml"'
+      headers['Content-Disposition'] = 'attachment; filename="drilldown.xml"'
       headers['Cache-Control'] = ''
       render template: '/drilldown/excel_export', layout: false
     end
 
-    def excel_export_transactions
+    def excel_export_records
       params[:search][:list] = '1'
       index(false)
-      @transactions = get_transactions(@result)
+      @records = get_records(@result)
       headers['Content-Type'] = 'application/vnd.ms-excel'
-      headers['Content-Disposition'] = 'attachment; filename="transactions.xml"'
-      render template: '/drilldown/excel_export_transactions', layout: false
+      headers['Content-Disposition'] = 'attachment; filename="drilldown.xml"'
+      render template: '/drilldown/excel_export_records', layout: false
     end
 
     def xml_export
       params[:search][:list] = '1'
       index(false)
-      @transactions = get_transactions(@result)
+      @records = get_records(@result)
       headers['Content-Type'] = 'text/xml'
-      headers['Content-Disposition'] = 'attachment; filename="transactions.xml"'
+      headers['Content-Disposition'] = 'attachment; filename="drilldown.xml"'
       render template: '/drilldown/xml_export', layout: false
     end
 
@@ -541,7 +541,7 @@ module SimpleDrilldown
       list_conditions = list_conditions(conditions, values)
       base_query = c_target_class.unscoped.where(c_base_condition).joins(joins).order(c_list_order)
       base_query = base_query.where(list_conditions) if list_conditions
-      result[:transactions] = base_query.to_a
+      result[:records] = base_query.to_a
     end
 
     def merge_includes(*args)
@@ -594,10 +594,10 @@ module SimpleDrilldown
       [list_conditions_string, *(conditions[1..-1] + values)]
     end
 
-    def get_transactions(tree)
-      return tree[:transactions] if tree[:transactions]
+    def get_records(tree)
+      return tree[:records] if tree[:records]
 
-      tree[:rows].map { |r| get_transactions(r) }.flatten
+      tree[:rows].map { |r| get_records(r) }.flatten
     end
 
     class ScopeHolder

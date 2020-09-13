@@ -108,6 +108,10 @@ module SimpleDrilldown
       'SEARCH'
     end
 
+    def list?
+      list
+    end
+
     def drill_down(dimensions, *values)
       raise 'Too many values' if values.size > self.dimensions.size
 

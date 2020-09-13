@@ -12,7 +12,7 @@ xml.Workbook(
 ) do
   xml << render(partial: '/layouts/excel_styles')
 
-  xml.Worksheet 'ss:Name' => 'Transactions' do
+  xml.Worksheet 'ss:Name' => 'Drilldown' do
     xml.Table do
       xml.Row 'ss:Height' => '18.75' do
         xml.Cell 'ss:MergeAcross' => '35', 'ss:StyleID' => 'MainTitle' do
@@ -42,7 +42,7 @@ xml.Workbook(
         end
       end
 
-      @transactions.each do |transaction|
+      @records.each do |transaction|
         xml.Row do
           @transaction_fields.each do |field|
             field_map = controller.c_fields[field.to_sym]

@@ -1,9 +1,9 @@
-<% unless result[:transactions].empty? %>
+<% unless result[:records].empty? %>
   <tr>
     <td colspan="<%= controller.c_summary_fields.size + 1 %>">
       <table class="table table-condensed table-bordered" style="padding-bottom: 10px;">
         <%= render :partial => '/drilldown/row_header' %>
-        <% result[:transactions].each do |t| %>
+        <% result[:records].each do |t| %>
           <%= render :partial => '/drilldown/row', :locals => { :transaction => t, :previous_transaction => nil, :errors => [], :error_row => false, :meter1_errors => false } %>
         <% end %>
       </table>

@@ -13,25 +13,25 @@
     }
 </style>
 
-<%= form_for @search, :html => {:id => 'edit_search_SEARCH', :method => :get, :class => :search, :style => 'background: inherit', :onsubmit => 'return this.submit()'}, :url => {} do |form| %>
+<%= form_for @search, html: { id: 'edit_search_SEARCH', method: :get, class: :search, style: 'background: inherit', onsubmit: 'return this.submit()' }, url: {} do |form| %>
     <div class="row">
       <div class="col-md-3" valign="top">
         <ul class="nav nav-tabs">
-          <li class="active">
-            <a href="#filter" data-toggle="tab"><em><%= t :filter %></em></a></li>
-          <li><a href="#fields" data-toggle="tab"><em><%= t :fields %></em></a>
+          <li class="nav-item">
+            <a class="nav-link active" href="#filter" data-toggle="tab"><em><%= t :filter %></em></a></li>
+          <li><a class="nav-link" href="#fields" data-toggle="tab"><em><%= t :fields %></em></a>
           </li>
         </ul>
 
         <!-- Tab panes -->
         <div class="tab-content">
           <div class="tab-pane active" id="filter">
-            <%= render :partial => '/drilldown/tab_buttons', :locals => {:form => form} %>
-            <%= render :partial => '/drilldown/filter', :locals => {:form => form} %>
+            <%= render '/drilldown/tab_buttons', form: form %>
+            <%= render '/drilldown/filter', form: form  %>
           </div>
           <div class="tab-pane" id="fields">
-            <%= render :partial => '/drilldown/tab_buttons', :locals => {:form => form} %>
-            <%= render :partial => '/drilldown/fields', :locals => {:form => form} %>
+            <%= render '/drilldown/tab_buttons', form: form %>
+            <%= render '/drilldown/fields', form: form %>
           </div>
         </div>
 
@@ -39,20 +39,16 @@
       <div class="col-md-9">
         <div class="row" valign="top">
           <div class="col-md-12">
-            <%= render :partial => '/drilldown/chart', :locals => {:form => form} %>
-            <br/>
+            <%= render '/drilldown/chart', form: form %>
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-12" valign="top">
             <div style="float: right; clear: both;">
-              <%= link_to 'Excel', @search.url_options.merge(action: :excel_export) %>&nbsp;|
-              <%= link_to 'HTML', @search.url_options.merge(action: :html_export), :data_popup => ['Elections', 'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes, width=1024px'] %>
+              <%= render '/drilldown/export_links' %>
             </div>
-            <br/>
-
-            <%= render :partial => '/drilldown/summary_table' %>
+            <%= render '/drilldown/summary_table' %>
           </div>
         </div>
       </div>
