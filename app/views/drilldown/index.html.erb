@@ -18,8 +18,8 @@
       <div class="col-md-3" valign="top">
         <ul class="nav nav-tabs">
           <li class="nav-item">
-            <a class="nav-link active" href="#filter" data-toggle="tab"><em><%= t :filter %></em></a></li>
-          <li><a class="nav-link" href="#fields" data-toggle="tab"><em><%= t :fields %></em></a>
+            <a id="filter-tab" class="nav-link active" data-target="#filter" data-toggle="tab"><%= t :filter %></a></li>
+          <li><a id="fields-tab" class="nav-link" data-target="#fields" data-toggle="tab"><%= t :fields %></a>
           </li>
         </ul>
 
@@ -97,7 +97,7 @@ form.submit = function() {
     return false;
 };
 
-$(document).ready(function () {
-  $('[data-behaviour~=datepicker]').datepicker({format: "yyyy-mm-dd"});
-})
+// $(document).ready(function () {
+//   $('[data-behaviour~=datepicker]').datepicker({format: "yyyy-mm-dd"});
+// })
 <% end %>
