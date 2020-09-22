@@ -11,9 +11,8 @@ module SimpleDrilldown
     end
 
     def caption
-      result = @search.title || "#{controller.c_target_class} #{t(@search.select_value.downcase)}" +
-                                (@dimensions && @dimensions.any? ? ' by ' + @dimensions.map { |d| d[:pretty_name] }.join(' and ') : '')
-      result.gsub('$date', [*@search.filter[:calendar_date]].uniq.join(' - '))
+      result = @search.title || caption_txt
+      result.gsub('$date', Array(@search.filter[:calendar_date]).uniq.join(' - '))
     end
 
     def subcaption
@@ -21,9 +20,15 @@ module SimpleDrilldown
     end
 
     def summary_row(result, parent_result = nil, dimension = 0, headers = [], new_row = true)
-      html = render(partial: '/drilldown/summary_row', locals: { result: result, parent_result: parent_result, new_row: new_row, dimension: dimension, headers: headers, with_results: !result[:rows] })
+      html = render(partial: '/drilldown/summary_row', locals: {
+                      result: result, parent_result: parent_result, new_row: new_row, dimension: dimension,
+                      headers: headers, with_results: !result[:rows]
+                    })
       if result[:rows]
-        sub_headers = headers + [{ value: result[:value], display_row_count: result[:nodes] + result[:row_count] * (@search.list ? 1 : 0) }]
+        sub_headers = headers + [{
+          value: result[:value],
+          display_row_count: result[:nodes] + result[:row_count] * (@search.list ? 1 : 0)
+        }]
         significant_rows = result[:rows].reject { |r| r[:row_count].zero? }
         significant_rows.each_with_index do |r, i|
           html << summary_row(r, result, dimension + 1, sub_headers, i.positive?)
@@ -31,7 +36,12 @@ module SimpleDrilldown
       elsif @search.list
         html << render(partial: '/drilldown/record_list', locals: { result: result })
       end
-      html << render(partial: '/drilldown/summary_total_row', locals: { result: result, parent_result: parent_result, headers: headers.dup, dimension: dimension }) if dimension < @dimensions.size
+      if dimension < @dimensions.size
+        html << render(partial: '/drilldown/summary_total_row',
+                       locals: {
+                         result: result, parent_result: parent_result, headers: headers.dup, dimension: dimension
+                       })
+      end
 
       html
     end
@@ -41,25 +51,42 @@ module SimpleDrilldown
       if result[:rows]
         significant_rows = result[:rows].reject { |r| r[:row_count].zero? }
         significant_rows.each_with_index do |r, i|
-          sub_headers = if i.zero?
-                          if dimension.zero?
-                            headers
-                          else
-                            headers + [{ value: result[:value], display_row_count: result[:nodes] + result[:row_count] * (@search.list ? 1 : 0) }]
-                          end
-                        else
-                          [] # [{:value => result[:value], :row_count => result[:row_count]}]
-                        end
+          sub_headers =
+            if i.zero?
+              if dimension.zero?
+                headers
+              else
+                headers + [{
+                  value: result[:value],
+                  display_row_count: result[:nodes] + result[:row_count] * (@search.list ? 1 : 0)
+                }]
+              end
+            else
+              [] # [{:value => result[:value], :row_count => result[:row_count]}]
+            end
           xml << excel_summary_row(r, result, dimension + 1, sub_headers)
         end
       else
-        xml << render(partial: '/drilldown/excel_summary_row', locals: { result: result, parent_result: parent_result, headers: headers.dup, dimension: dimension })
+        xml << render(partial: '/drilldown/excel_summary_row',
+                      locals: { result: result, parent_result: parent_result, headers: headers.dup,
+                                dimension: dimension })
 
         xml << render(partial: '/drilldown/excel_record_list', locals: { result: result }) if @search.list
       end
 
-      xml << render(partial: '/drilldown/excel_summary_total_row', locals: { result: result, headers: headers.dup, dimension: dimension }) if dimension < @dimensions.size
+      if dimension < @dimensions.size
+        xml << render(partial: '/drilldown/excel_summary_total_row', locals: {
+                        result: result, headers: headers.dup, dimension: dimension
+                      })
+      end
       xml
+    end
+
+    private
+
+    def caption_txt
+      "#{controller.c_target_class} #{t(@search.select_value.downcase)}" +
+        (@dimensions && @dimensions.any? ? " by #{@dimensions.map { |d| d[:pretty_name] }.join(' and ')}" : '')
     end
   end
 end

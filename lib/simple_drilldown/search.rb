@@ -19,17 +19,9 @@ module SimpleDrilldown
       VOLUME_COMPENSATED = 'VOLUME_COMPENSATED'
     end
 
-    attr_reader :dimensions
-    attr_reader :display_type
-    attr_reader :fields
-    attr_reader :filter
-    attr_accessor :list
-    attr_accessor :percent
-    attr_reader :list_change_times
-    attr_reader :order_by_value
-    attr_reader :select_value
-    attr_reader :title
-    attr_reader :default_fields
+    attr_reader :dimensions, :display_type, :fields, :filter, :list_change_times, :order_by_value,
+                :select_value, :title, :default_fields
+    attr_accessor :list, :percent
 
     def self.validators_on(_attribute)
       []
@@ -60,7 +52,7 @@ module SimpleDrilldown
         @dimensions = attributes && attributes[:dimensions] || []
         @dimensions.delete_if(&:empty?)
         @filter = attributes && attributes[:filter] ? attributes[:filter] : {}
-        @filter.keys.dup.each { |k| @filter[k] = [*@filter[k]] }
+        @filter.keys.dup.each { |k| @filter[k] = Array(@filter[k]) }
         @filter.each do |_k, v|
           v.delete('')
           v.delete('Select Some Options')

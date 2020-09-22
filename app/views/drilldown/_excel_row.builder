@@ -6,7 +6,12 @@ xml.Row do
 
   @search.fields.each_with_index do |field, i|
     if field == 'time'
-      value = (transaction.respond_to?(:completed_at) ? transaction.completed_at : transaction.created_at).localtime.strftime('%Y-%m-%d %H:%M')
+      value = ((
+      if transaction.respond_to?(:completed_at)
+        transaction.completed_at
+      else
+        transaction.created_at
+      end)).localtime.strftime('%Y-%m-%d %H:%M')
     else
       value = if @transaction_fields_map[field.to_sym][:attr_method]
                 @transaction_fields_map[field.to_sym][:attr_method].call(transaction)

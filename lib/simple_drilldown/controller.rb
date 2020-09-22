@@ -33,6 +33,7 @@ module SimpleDrilldown
           begin
             base.c_target_class = base.name.chomp('Controller').constantize
           rescue NameError
+            # No default target class found
           end
         end
       end
@@ -101,7 +102,9 @@ module SimpleDrilldown
         raise "Unexpected options: #{options.inspect}" if options.present?
 
         queries.each do |query_opts|
-          raise "Unknown options: #{query_opts.keys.inspect}" unless (query_opts.keys - %i[select includes where]).empty?
+          unless (query_opts.keys - %i[select includes where]).empty?
+            raise "Unknown options: #{query_opts.keys.inspect}"
+          end
         end
 
         c_dimension_defs[name.to_s] = {
@@ -125,7 +128,7 @@ module SimpleDrilldown
           pretty_name: I18n.t(name, default: :"activerecord.models.#{name}"),
           queries: queries,
           reverse: reverse,
-          select_expression: queries.size > 1 ? "COALESCE(#{queries.map { |q| q[:select] }.join(',')})" : queries[0][:select],
+          select_expression: "COALESCE(#{queries.map { |q| q[:select] }.join(',')})",
           row_class: row_class,
           url_param_name: name.to_s
         }
@@ -182,7 +185,7 @@ module SimpleDrilldown
             dimension_def = c_dimension_defs[field]
             raise "Unknown filter field: #{field.inspect}" if dimension_def.nil?
 
-            values = [*values]
+            values = Array(values)
             if dimension_def[:interval]
               values *= 2 if values.size == 1
               raise "Need 2 values for interval filter: #{values.inspect}" if values.size != 2
@@ -237,9 +240,9 @@ module SimpleDrilldown
         when Hash
           sql = +''
           include.each do |parent, child|
-            sql << ' ' + make_join(joins, model, parent)
+            sql << " #{make_join(joins, model, parent)}"
             ass = model.to_s.camelize.constantize.reflect_on_association parent
-            sql << ' ' + make_join(joins, parent, child, ass.class_name.constantize)
+            sql << " #{make_join(joins, parent, child, ass.class_name.constantize)}"
           end
           sql
         when Symbol
@@ -373,8 +376,7 @@ module SimpleDrilldown
       selected = @search.filter[dimension_name] || []
       raise "Unknown dimension #{dimension_name.inspect}: #{c_dimension_defs.keys.inspect}" unless dimension
 
-      choices = [[t(:all), nil]] +
-                (dimension[:legal_values]&.call(@search)&.map { |o| o.is_a?(Array) ? o[0..1].map(&:to_s) : o.to_s } || [])
+      choices = [[t(:all), nil]] + (legal_values_for_dimension(dimension) || [])
       choices_html = choices.map do |c|
         %(<option value="#{c[1]}"#{' SELECTED' if selected.include?(c[1])}>#{c[0]}</option>)
       end.join("\n")
@@ -413,6 +415,10 @@ module SimpleDrilldown
     end
 
     private
+
+    def legal_values_for_dimension(dimension)
+      dimension[:legal_values]&.call(@search)&.map { |o| o.is_a?(Array) ? o[0..1].map(&:to_s) : o.to_s }
+    end
 
     def new_search_object
       SimpleDrilldown::Search.new(params[:search]&.to_unsafe_h, c_default_fields, c_default_select_value)
@@ -495,7 +501,8 @@ module SimpleDrilldown
 
       result_rows = []
       loop do
-        sub_result = result_from_rows(rows, row_index, dimension + 1, values + [rows[row_index]["value#{dimension + 1}"]])
+        sub_result = result_from_rows(rows, row_index, dimension + 1,
+                                      values + [rows[row_index]["value#{dimension + 1}"]])
         break if sub_result.nil?
 
         result_rows << sub_result
@@ -517,23 +524,20 @@ module SimpleDrilldown
     end
 
     def populate_list(conditions, includes, result, values)
-      if result[:rows]
-        return result[:rows].each { |r| populate_list(conditions, includes, r, values + [r[:value]]) }
-      end
+      return result[:rows].each { |r| populate_list(conditions, includes, r, values + [r[:value]]) } if result[:rows]
+
       list_includes = merge_includes(includes, c_list_includes)
       @search.fields.each do |field|
         field_def = c_fields[field.to_sym]
         raise "Field definition missing for: #{field.inspect}" unless field_def
 
         field_includes = field_def[:include]
-        if field_includes
-          list_includes = merge_includes(list_includes , field_includes)
-        end
+        list_includes = merge_includes(list_includes, field_includes) if field_includes
       end
       if @search.list_change_times
         @history_fields.each do |f|
           if @search.fields.include? f
-            list_includes = merge_includes(list_includes, assignment: { order: :"#{f}_changes" } )
+            list_includes = merge_includes(list_includes, assignment: { order: :"#{f}_changes" })
           end
         end
       end
@@ -546,12 +550,12 @@ module SimpleDrilldown
 
     def merge_includes(*args)
       hash = hash_includes(*args)
-      result = hash.dup.map { |k, v|
+      result = hash.dup.map do |k, v|
         if v.blank?
           hash.delete(k)
           k
         end
-      }.compact
+      end.compact
       result << hash unless hash.blank?
       case result.size
       when 0
@@ -567,14 +571,15 @@ module SimpleDrilldown
       args.inject({}) do |h, inc|
         case inc
         when Array
-          inc.each { |v|
+          inc.each do |v|
             h = hash_includes(h, v)
-          }
+          end
         when Hash
-          inc.each { |k, v|
+          inc.each do |k, v|
             h[k] = merge_includes(h[k], v)
-          }
+          end
         when NilClass, FalseClass
+          # Leave as it is
         when String, Symbol
           h[inc] ||= []
         else
