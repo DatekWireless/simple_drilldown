@@ -405,15 +405,6 @@ module SimpleDrilldown
       render template: '/drilldown/excel_export_records', layout: false
     end
 
-    def xml_export
-      params[:search][:list] = '1'
-      index(false)
-      @records = get_records(@result)
-      headers['Content-Type'] = 'text/xml'
-      headers['Content-Disposition'] = 'attachment; filename="drilldown.xml"'
-      render template: '/drilldown/xml_export', layout: false
-    end
-
     private
 
     def legal_values_for_dimension(dimension)
