@@ -390,9 +390,7 @@ module SimpleDrilldown
 
     def excel_export
       index(false)
-      headers['Content-Type'] = 'application/vnd.ms-excel'
-      headers['Content-Disposition'] = 'attachment; filename="drilldown.xml"'
-      headers['Cache-Control'] = ''
+      set_excel_headers
       render template: '/drilldown/excel_export', layout: false
     end
 
@@ -400,12 +398,17 @@ module SimpleDrilldown
       params[:search][:list] = '1'
       index(false)
       @records = get_records(@result)
-      headers['Content-Type'] = 'application/vnd.ms-excel'
-      headers['Content-Disposition'] = 'attachment; filename="drilldown.xml"'
+      set_excel_headers
       render template: '/drilldown/excel_export_records', layout: false
     end
 
     private
+
+    def set_excel_headers
+      headers['Content-Type'] = 'application/vnd.ms-excel'
+      headers['Content-Disposition'] = %{attachment; filename="#{c_target_class.table_name}.xml"}
+      headers['Cache-Control'] = ''
+    end
 
     def legal_values_for_dimension(dimension)
       dimension[:legal_values]&.call(@search)&.map { |o| o.is_a?(Array) ? o[0..1].map(&:to_s) : o.to_s }
