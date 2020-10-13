@@ -17,6 +17,7 @@ class UserDrilldownController < SimpleDrilldown::Controller
   list_order 'users.created_at'
 
   # Field definitions when listing records
+  field :name
   field :created_at
   field :updated_at
 
@@ -37,6 +38,6 @@ class UserDrilldownController < SimpleDrilldown::Controller
   dimension :week, "strftime('%W', users.created_at)"
   dimension :year, "strftime('%Y', users.created_at)"
 
-  # dimension :comments, 'SELECT count(*) FROM comments c WHERE c.user_id = users.id'
+  dimension :comments, '(SELECT count(*) FROM comments c WHERE c.user_id = users.id)'
   # dimension :user, 'users.name', includes: :user
 end

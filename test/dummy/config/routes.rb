@@ -10,11 +10,6 @@ Rails.application.routes.draw do
     end
   end
   resources :posts
-  resources(:user_drilldown, only: :index) do
-    collection do
-      get :excel_export
-      get :html_export
-    end
-  end
+  draw_drilldown :user
   resources :users
 end

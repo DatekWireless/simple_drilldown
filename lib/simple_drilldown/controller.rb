@@ -128,7 +128,8 @@ module SimpleDrilldown
           pretty_name: I18n.t(name, default: :"activerecord.models.#{name}"),
           queries: queries,
           reverse: reverse,
-          select_expression: "COALESCE(#{queries.map { |q| q[:select] }.join(',')})",
+          select_expression:
+            queries.size == 1 ? queries[0][:select] : "COALESCE(#{queries.map { |q| q[:select] }.join(',')})",
           row_class: row_class,
           url_param_name: name.to_s
         }
@@ -385,21 +386,24 @@ module SimpleDrilldown
 
     def html_export
       index(false)
-      render template: '/drilldown/html_export', layout: 'print'
+      render template: '/drilldown/html_export', layout: '../drilldown/print'
     end
 
     def excel_export
       index(false)
       set_excel_headers
-      render template: '/drilldown/excel_export', layout: false
+      if params.dig(:search, :list) == '1'
+        @records = get_records(@result)
+        render template: '/drilldown/excel_export_records', layout: false
+      else
+        render template: '/drilldown/excel_export', layout: false
+      end
     end
 
     def excel_export_records
+      params[:search] ||= {}
       params[:search][:list] = '1'
-      index(false)
-      @records = get_records(@result)
-      set_excel_headers
-      render template: '/drilldown/excel_export_records', layout: false
+      excel_export
     end
 
     private

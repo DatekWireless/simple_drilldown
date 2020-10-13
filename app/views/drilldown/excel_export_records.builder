@@ -10,7 +10,7 @@ xml.Workbook(
   'xmlns:ss' => 'urn:schemas-microsoft-com:office:spreadsheet',
   'xmlns:html' => 'http://www.w3.org/TR/REC-html40'
 ) do
-  xml << render(partial: '/layouts/excel_styles')
+  xml << render(partial: '/drilldown/excel_styles')
 
   xml.Worksheet 'ss:Name' => 'Drilldown' do
     xml.Table do
@@ -29,14 +29,14 @@ xml.Workbook(
         @transaction_fields.each do |field|
           if field == 'time'
             xml.Cell do
-              xml.Data (l :short_date).to_s, 'ss:Type' => 'String'
+              xml.Data (t :short_date).to_s, 'ss:Type' => 'String'
             end
             xml.Cell do
-              xml.Data (l :time).to_s, 'ss:Type' => 'String'
+              xml.Data (t :time).to_s, 'ss:Type' => 'String'
             end
           else
             xml.Cell do
-              xml.Data (l field).to_s, 'ss:Type' => 'String'
+              xml.Data (t field).to_s, 'ss:Type' => 'String'
             end
           end
         end
