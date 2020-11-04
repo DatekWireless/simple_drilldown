@@ -29,6 +29,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'chartkick', '~>3.3'
   spec.add_dependency 'rails', '>=5.2', '<7'
 
-  spec.add_development_dependency 'rubocop', '~>0.80'
-  spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'rubocop', '~>1.1'
+  if RUBY_ENGINE == 'jruby'
+    spec.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
+  else
+    spec.add_development_dependency 'sqlite3'
+  end
 end

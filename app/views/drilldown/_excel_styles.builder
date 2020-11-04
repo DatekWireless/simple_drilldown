@@ -46,8 +46,7 @@ xml.Styles do
     xml.Interior 'ss:Color' => '#dedede', 'ss:Pattern' => 'Solid'
     xml.NumberFormat 'ss:Format' => "\#,\#\#0"
   end
-  xml.Style 'ss:ID' => 'Outer' do
-  end
+  xml.Style 'ss:ID' => 'Outer'
   xml.Style 'ss:ID' => 'ShortDate' do
     xml.NumberFormat 'ss:Format' => 'Short Date'
   end
