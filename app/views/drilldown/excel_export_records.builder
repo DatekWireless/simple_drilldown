@@ -26,7 +26,7 @@ xml.Workbook(
       end
 
       xml.Row 'ss:StyleID' => 'Heading' do
-        @transaction_fields.each do |field|
+        @search.fields.each do |field|
           if field == 'time'
             xml.Cell do
               xml.Data (t :short_date).to_s, 'ss:Type' => 'String'
@@ -44,7 +44,7 @@ xml.Workbook(
 
       @records.each do |transaction|
         xml.Row do
-          @transaction_fields.each do |field|
+          @search.fields.each do |field|
             field_map = controller.c_fields[field.to_sym]
             if field == 'time'
               xml.Cell 'ss:StyleID' => 'DateOnlyFormat' do
@@ -54,7 +54,8 @@ xml.Workbook(
                 xml.Data transaction.completed_at.gmtime.xmlschema, 'ss:Type' => 'DateTime'
               end
             else
-              value = field_map[:attr_method] ? field_map[:attr_method].call(transaction) : transaction.send(field)
+              attr_method = field_map[:attr_method]
+              value = attr_method ? attr_method.call(transaction) : transaction.send(field)
               xml.Cell field_map[:excel_style] ? { 'ss:StyleID' => field_map[:excel_style] } : {} do
                 xml.Data value, 'ss:Type' => field_map[:excel_type] || 'String'
               end
