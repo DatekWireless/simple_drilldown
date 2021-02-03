@@ -3,6 +3,10 @@
 module SimpleDrilldown
   # View helper for SimpleDrilldown
   module Helper
+    # FIXME(uwe): Should not be necessary: https://github.com/rails/rails/issues/41038
+    include Rails.application.routes.url_helpers
+    # EMXIF
+
     def value_label(dimension_index, value)
       dimension = @dimensions[dimension_index]
       return nil if dimension.nil?

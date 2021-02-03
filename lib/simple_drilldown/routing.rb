@@ -7,10 +7,9 @@ module SimpleDrilldown
       path = "#{path}_drilldown" unless /_drilldown$/.match?(path)
       controller ||= path
       get "#{path}(.:format)" => "#{controller}#index", as: path
-      scope path, as: path do
-        %i[choices excel_export excel_export_records html_export index].each do |action|
-          get "#{action}(/:id)(.:format)", controller: controller, action: action, as: action
-        end
+      scope path, controller: controller, as: path do
+        %i[excel_export excel_export_records html_export].each { |action| get action }
+        get "choices/:dimension_name", action: :choices, as: :choices
       end
     end
   end
