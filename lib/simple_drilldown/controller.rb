@@ -36,6 +36,9 @@ module SimpleDrilldown
             # No default target class found
           end
         end
+        return unless base.c_target_class.try :paranoid?
+
+        base.c_base_condition = "#{base.c_target_class.table_name}.deleted_at IS NULL"
       end
 
       def base_condition(base_condition)
