@@ -9,7 +9,7 @@ module SimpleDrilldown
       get "#{path}(.:format)" => "#{controller}#index", as: path
       scope path, controller: controller, as: path do
         %i[excel_export excel_export_records html_export].each { |action| get action }
-        get "choices/:dimension_name", action: :choices, as: :choices
+        get 'choices/:dimension_name', action: :choices, as: :choices
       end
     end
   end

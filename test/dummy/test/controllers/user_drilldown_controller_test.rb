@@ -6,13 +6,13 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   setup { @user = users(:one) }
 
   test 'should get index' do
-    get user_drilldown_index_url
+    get user_drilldown_url
     assert_response :success
   end
 
     # { :value => 'All', :count => 3, :volume => 22, :volume_compensated => 23}
   def test_index_with_no_dimension
-    get user_drilldown_index_path, params: { search: { filter: { calendar_date: %w[2009-01-01
+    get user_drilldown_path, params: { search: { filter: { calendar_date: %w[2009-01-01
                                                                                           2009-03-30] } } }
     assert_response :success
   end
@@ -24,7 +24,7 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   #   ]
   # }
   def test_index_with_1_dimension
-    get user_drilldown_index_path, params: { search: { dimensions: ['year'],
+    get user_drilldown_path, params: { search: { dimensions: ['year'],
                                                               filter: { calendar_date: %w[2009-01-01
                                                                                           2009-03-30] } } }
     assert_response :success
@@ -47,7 +47,7 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   #   ]
   # }
   def test_index_with_2_dimension
-    get user_drilldown_index_path, params: { search: { dimensions: %w[year month],
+    get user_drilldown_path, params: { search: { dimensions: %w[year month],
                                                               filter: { calendar_date: %w[2009-01-01
                                                                                           2009-03-30] } } }
     assert_response :success
@@ -94,27 +94,27 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   #   },
   # ]
   def test_index_with_3_dimension
-    get user_drilldown_index_path, params: { search: { dimensions: %w[year month day_of_month],
+    get user_drilldown_path, params: { search: { dimensions: %w[year month day_of_month],
                                                               filter: { calendar_date: %w[2009-01-01
                                                                                           2009-03-30] } } }
     assert_response :success
   end
 
   def test_empty_result_with_0_dimension
-    get user_drilldown_index_path, params: { search: { display_type: 'NONE',
+    get user_drilldown_path, params: { search: { display_type: 'NONE',
                                                               filter: { calendar_date: '2009-06-04' } } }
     assert_response :success
   end
 
   def test_empty_result_with_1_dimension
-    get user_drilldown_index_path, params: { search: {
+    get user_drilldown_path, params: { search: {
       dimensions: ['month'], display_type: 'NONE', filter: { calendar_date: '2009-06-04' }
     } }
     assert_response :success
   end
 
   def test_empty_result_with_2_dimension
-    get user_drilldown_index_path, params: { search: {
+    get user_drilldown_path, params: { search: {
       dimensions: %w[year month], display_type: 'NONE',
       filter: { calendar_date: '2009-06-04' }
     } }
@@ -122,7 +122,7 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_empty_result_with_3_dimension
-    get user_drilldown_index_path, params: { search: {
+    get user_drilldown_path, params: { search: {
       dimensions: %w[year month day_of_month], display_type: 'NONE',
       filter: { calendar_date: '2009-06-04' }
     } }
@@ -130,7 +130,7 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_multiple_joins_to_contract_in_legal_values
-    get user_drilldown_index_path, params: { search: {
+    get user_drilldown_path, params: { search: {
       dimensions: ['year'],
       filter: {
         calendar_date: %w[2009-01-01 2009-03-30],
@@ -170,7 +170,7 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   end
 
   def test_filter_with_single_value
-    get user_drilldown_index_path, params: { search: { display_type: 'NONE',
+    get user_drilldown_path, params: { search: { display_type: 'NONE',
                                                               filter: { month: '10' } } }
     assert_response :success
   end
