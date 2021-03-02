@@ -323,6 +323,7 @@ module SimpleDrilldown
 
       conditions, @filter_text, filter_includes = self.class.make_conditions(@search.filter)
       includes += filter_includes
+      includes.flatten!
       includes.keep_if(&:present?).uniq!
       if @search.order_by_value && @dimensions.size <= 1
         order = case @search.select_value
