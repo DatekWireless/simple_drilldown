@@ -10,10 +10,10 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-    # { :value => 'All', :count => 3, :volume => 22, :volume_compensated => 23}
+  # { :value => 'All', :count => 3, :volume => 22, :volume_compensated => 23}
   def test_index_with_no_dimension
     get user_drilldown_path, params: { search: { filter: { calendar_date: %w[2009-01-01
-                                                                                          2009-03-30] } } }
+                                                                             2009-03-30] } } }
     assert_response :success
   end
 
@@ -25,8 +25,8 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   # }
   def test_index_with_1_dimension
     get user_drilldown_path, params: { search: { dimensions: ['year'],
-                                                              filter: { calendar_date: %w[2009-01-01
-                                                                                          2009-03-30] } } }
+                                                 filter: { calendar_date: %w[2009-01-01
+                                                                             2009-03-30] } } }
     assert_response :success
   end
 
@@ -48,8 +48,8 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   # }
   def test_index_with_2_dimension
     get user_drilldown_path, params: { search: { dimensions: %w[year month],
-                                                              filter: { calendar_date: %w[2009-01-01
-                                                                                          2009-03-30] } } }
+                                                 filter: { calendar_date: %w[2009-01-01
+                                                                             2009-03-30] } } }
     assert_response :success
   end
 
@@ -95,14 +95,14 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   # ]
   def test_index_with_3_dimension
     get user_drilldown_path, params: { search: { dimensions: %w[year month day_of_month],
-                                                              filter: { calendar_date: %w[2009-01-01
-                                                                                          2009-03-30] } } }
+                                                 filter: { calendar_date: %w[2009-01-01
+                                                                             2009-03-30] } } }
     assert_response :success
   end
 
   def test_empty_result_with_0_dimension
     get user_drilldown_path, params: { search: { display_type: 'NONE',
-                                                              filter: { calendar_date: '2009-06-04' } } }
+                                                 filter: { calendar_date: '2009-06-04' } } }
     assert_response :success
   end
 
@@ -171,8 +171,7 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
 
   def test_filter_with_single_value
     get user_drilldown_path, params: { search: { display_type: 'NONE',
-                                                              filter: { month: '10' } } }
+                                                 filter: { month: '10' } } }
     assert_response :success
   end
-
 end

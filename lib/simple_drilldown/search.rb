@@ -81,15 +81,15 @@ module SimpleDrilldown
 
     def url_options
       o = {
-          search: {
-              title: title,
-              list: list ? '1' : '0',
-              percent: percent ? '1' : '0',
-              list_change_times: list_change_times ? '1' : '0',
-              filter: filter,
-              dimensions: dimensions,
-              display_type: display_type,
-          },
+        search: {
+          title: title,
+          list: list ? '1' : '0',
+          percent: percent ? '1' : '0',
+          list_change_times: list_change_times ? '1' : '0',
+          filter: filter,
+          dimensions: dimensions,
+          display_type: display_type,
+        },
       }
       o[:search][:fields] = fields unless fields == @default_fields
       o
