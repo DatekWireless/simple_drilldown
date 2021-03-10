@@ -10,10 +10,14 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test 'should get index with list' do
+    get user_drilldown_url, params: { search: { list: 1 } }
+    assert_response :success
+  end
+
   # { :value => 'All', :count => 3, :volume => 22, :volume_compensated => 23}
   def test_index_with_no_dimension
-    get user_drilldown_path, params: { search: { filter: { calendar_date: %w[2009-01-01
-                                                                             2009-03-30] } } }
+    get user_drilldown_path, params: { search: { filter: { calendar_date: %w[2009-01-01 2009-03-30] } } }
     assert_response :success
   end
 
@@ -147,25 +151,35 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  def test_excel_export
-    get user_drilldown_excel_export_path
+  def test_excel_export_xml
+    get user_drilldown_excel_export_path format: :xml
+    assert_response :success
+  end
+
+  def test_excel_export_xlsx
+    get user_drilldown_excel_export_path format: :xlsx
     assert_response :success
   end
 
   def test_excel_export_with_filter
     get user_drilldown_excel_export_path,
-        params: { search: { filter: { calendar_date: '2010-03-30' } } }
+        params: { search: { filter: { calendar_date: '2010-03-30' } }, format: :xlsx }
     assert_response :success
   end
 
-  def test_excel_export_records
-    get user_drilldown_excel_export_records_path
+  def test_excel_export_records_xml
+    get user_drilldown_excel_export_records_path(format: :xml)
+    assert_response :success
+  end
+
+  def test_excel_export_records_xlsx
+    get user_drilldown_excel_export_records_path(format: :xlsx)
     assert_response :success
   end
 
   def test_excel_export_records_with_filter
     get user_drilldown_excel_export_records_path,
-        params: { search: { filter: { calendar_date: '2010-03-30' } } }
+        params: { search: { filter: { calendar_date: '2010-03-30' } }, format: :xlsx }
     assert_response :success
   end
 

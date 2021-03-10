@@ -1,0 +1,38 @@
+# frozen_string_literal: true
+
+def excel_header_row(sheet)
+  padding_cells = @dimensions.empty? ? 1 : @dimensions.size
+  row = (1...(padding_cells - 1)).map { |_n| nil }
+  @search.fields.each_with_index { |field, _i| row << t(field) }
+  sheet.add_row row
+end
+
+def excel_row(sheet, transaction:)
+  padding_cells = @dimensions.empty? ? 1 : @dimensions.size
+  row = (1..(padding_cells - 1)).map { |_n| nil }
+
+  @search.fields.each_with_index do |field, _i|
+    value = if field == 'time'
+              ((
+              if transaction.respond_to?(:completed_at)
+                transaction.completed_at
+              else
+                transaction.created_at
+              end)).localtime.strftime('%Y-%m-%d %H:%M')
+            elsif controller.c_fields[field.to_sym][:attr_method]
+              controller.c_fields[field.to_sym][:attr_method].call(transaction)
+            else
+              transaction.send(field)
+            end
+
+    # field_def = controller.c_fields[field.to_sym]
+
+    row << value
+  end
+  sheet.add_row row
+end
+
+sheet.add_row []
+excel_header_row(sheet)
+result[:records].each { |t| excel_row(sheet, transaction: t) }
+sheet.add_row []

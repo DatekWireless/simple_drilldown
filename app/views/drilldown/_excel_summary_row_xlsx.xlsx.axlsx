@@ -1,0 +1,31 @@
+# frozen_string_literal: true
+
+row = [
+  *(1..(dimension - headers.size - 1)).map { |_n| '' },
+  *headers.map.with_index { |h, i| value_label(@dimensions.size - headers.size + i - 1, h[:value]) },
+  *(value_label(dimension - 1, result[:value]) if dimension.positive?),
+  *((result[:count].to_f / parent_result[:count]).inspect if parent_result && @search.percent),
+  result[:count].inspect,
+  *(if parent_result && @search.percent
+      (
+        if parent_result[controller.c_summary_fields[0]].positive?
+          result[controller.c_summary_fields[0]].to_f / parent_result[controller.c_summary_fields[0]]
+        else
+          0
+        end).inspect
+    end),
+  result[controller.c_summary_fields[0]].inspect
+]
+if controller.c_summary_fields.size > 1
+  if parent_result && @search.percent
+    percent =
+      if parent_result[controller.c_summary_fields[1]].positive?
+        result[controller.c_summary_fields[1]].to_f / parent_result[controller.c_summary_fields[1]]
+      else
+        0
+      end
+    row << percent.inspect
+  end
+  row << result[controller.c_summary_fields[1]].inspect
+end
+sheet.add_row row

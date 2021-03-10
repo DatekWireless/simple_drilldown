@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+row = (1..dimension).map { |_n| nil }
+
+(@dimensions.size - dimension).times { |_i| row << nil }
+row << result[:count]
+sheet.add_row row

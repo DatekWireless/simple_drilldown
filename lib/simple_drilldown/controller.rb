@@ -395,12 +395,19 @@ module SimpleDrilldown
 
     def excel_export
       index(false)
-      set_excel_headers
-      if params.dig(:search, :list) == '1'
-        @records = get_records(@result)
-        render template: '/drilldown/excel_export_records', layout: false
-      else
-        render template: '/drilldown/excel_export', layout: false
+      respond_to do |format|
+        format.xlsx do
+          render xlsx: c_target_class.table_name, template: 'drilldown/excel_export_xlsx'
+        end
+        format.xml do
+          set_excel_headers
+          if params.dig(:search, :list) == '1'
+            @records = get_records(@result)
+            render template: 'drilldown/excel_export_records', layout: false
+          else
+            render template: 'drilldown/excel_export', layout: false
+          end
+        end
       end
     end
 
