@@ -1,11 +1,18 @@
 one:
-  title: MyString
-  body: MyText
+  title: One Post
+  body: The body of One Post
   user: one
   published_at: 2020-06-20 08:25:40
 
 two:
-  title: MyString
-  body: MyText
+  title: Two Post
+  body: The body of Two Post.
   user: two
   published_at: 2020-06-20 08:25:40
+
+deleted:
+  title: Deleted Post
+  body: The body of Deleted Post.
+  user: two
+  published_at: <%=2.hours.ago.iso8601%>
+  deleted_at: <%=1.hour.ago.iso8601%>

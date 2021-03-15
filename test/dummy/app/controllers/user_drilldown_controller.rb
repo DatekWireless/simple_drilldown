@@ -2,7 +2,7 @@
 
 class UserDrilldownController < SimpleDrilldown::Controller
   # What fields should be displayed as default when listing actual User records.
-  default_fields %w[created_at updated_at] # TODO(uwe): Read fields from schema?
+  default_fields %w[name comments created_at updated_at] # TODO(uwe): Read fields from schema?
 
   # The main focus of the drilldown
   target_class User
@@ -18,6 +18,7 @@ class UserDrilldownController < SimpleDrilldown::Controller
 
   # Field definitions when listing records
   field :name
+  field :comments, attr_method: ->(user) { user.comments.size }
   field :created_at
   field :updated_at
 

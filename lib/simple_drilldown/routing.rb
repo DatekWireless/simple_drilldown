@@ -12,6 +12,7 @@ module SimpleDrilldown
           get action, defaults: { format: format }
         end
         get 'choices/:dimension_name', action: :choices, as: :choices
+        yield if block_given?
       end
     end
   end

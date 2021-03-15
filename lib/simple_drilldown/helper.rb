@@ -38,7 +38,7 @@ module SimpleDrilldown
           html << summary_row(r, result, dimension + 1, sub_headers, i.positive?)
         end
       elsif @search.list
-        html << render(partial: '/drilldown/record_list', locals: { result: result })
+        html << render(partial: '/drilldown/record_list', locals: { result: result, dimension: dimension })
       end
       if dimension < @dimensions.size
         html << render(partial: '/drilldown/summary_total_row',
@@ -89,7 +89,7 @@ module SimpleDrilldown
     private
 
     def caption_txt
-      "#{controller.c_target_class} #{t(@search.select_value.downcase)}" +
+      "#{controller.c_target_class} #{I18n.t(@search.select_value.downcase)}" +
         (@dimensions && @dimensions.any? ? " by #{@dimensions.map { |d| d[:pretty_name] }.join(' and ')}" : '')
     end
   end

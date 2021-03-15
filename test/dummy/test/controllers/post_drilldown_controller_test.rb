@@ -8,10 +8,29 @@ class PostDrilldownControllerTest < ActionDispatch::IntegrationTest
   test 'should get index' do
     get post_drilldown_index_url
     assert_response :success
+    assert_select 'table#drilldown-summary-table > tbody > tr', count: 1
+    assert_select <<~CSS.squish, '2'
+      table#drilldown-summary-table > tbody > tr > td
+    CSS
   end
 
   def test_should_get_index_with_list
-    get post_drilldown_index_url search: { list: 1 }
+    get post_drilldown_index_url params: { search: { list: 1 } }
     assert_response :success
+    puts response.body
+    assert_select 'table#drilldown-summary-table > tbody > tr', count: 2
+    assert_select <<~CSS.squish, '2'
+      table#drilldown-summary-table > tbody > tr > td
+    CSS
+    assert_select 'table#drilldown-summary-table > tbody > tr table#drilldown-records-All', count: 1
+    assert_select <<~CSS.squish, count: 2
+      table#drilldown-summary-table > tbody > tr table#drilldown-records-All > tbody > tr
+    CSS
+    assert_select <<~CSS.squish, 'Show'
+      table#drilldown-summary-table > tbody > tr table#drilldown-records-All > tbody > tr:first-of-type > td
+    CSS
+    assert_select <<~CSS.squish, 'Show'
+      table#drilldown-summary-table > tbody > tr table#drilldown-records-All > tbody > tr:nth-of-type(2) > td
+    CSS
   end
 end

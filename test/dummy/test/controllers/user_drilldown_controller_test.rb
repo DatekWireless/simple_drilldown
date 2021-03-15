@@ -13,6 +13,15 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
   test 'should get index with list' do
     get user_drilldown_url, params: { search: { list: 1 } }
     assert_response :success
+    assert_select 'table#drilldown-summary-table > tbody > tr', count: 2
+    assert_select 'table#drilldown-summary-table > tbody > tr table#drilldown-records-All', count: 1
+    assert_select 'table#drilldown-summary-table > tbody > tr table#drilldown-records-All > tbody > tr', count: 2
+    assert_select <<~CSS.squish, '1'
+      table#drilldown-summary-table > tbody > tr table#drilldown-records-All > tbody > tr:first-of-type > td
+    CSS
+    assert_select <<~CSS.squish, '1'
+      table#drilldown-summary-table > tbody > tr table#drilldown-records-All > tbody > tr:nth-of-type(2) > td
+    CSS
   end
 
   # { :value => 'All', :count => 3, :volume => 22, :volume_compensated => 23}

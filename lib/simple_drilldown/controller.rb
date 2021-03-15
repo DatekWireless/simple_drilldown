@@ -15,7 +15,7 @@ module SimpleDrilldown
     class_attribute :c_default_fields, default: []
     class_attribute :c_default_select_value, default: SimpleDrilldown::Search::SelectValue::COUNT
     class_attribute :c_dimension_defs
-    class_attribute :c_fields
+    class_attribute :c_fields, default: []
     class_attribute :c_list_includes, default: []
     class_attribute :c_list_order
     class_attribute :c_select, default: 'count(*) as count'
@@ -153,14 +153,15 @@ module SimpleDrilldown
               end
               includes.uniq!
             end
-            rows = c_target_class.unscoped.where(c_base_condition)
-                                 .select("#{query[:select]} AS value")
-                                 .where(filter_conditions || '1=1')
-                                 .where(query[:where] || '1=1')
-                                 .joins(make_join([], c_target_class.name.underscore.to_sym, includes))
-                                 .order('value')
-                                 .group(:value)
-                                 .to_a
+            rows_query = c_target_class.unscoped.where(c_base_condition)
+                                       .select("#{query[:select]} AS value")
+                                       .joins(make_join([], c_target_class.name.underscore.to_sym, includes))
+                                       .order('value')
+                                       .group(:value)
+            # rows_query = rows_query.without_deleted if c_target_class.try :paranoid?
+            rows_query = rows_query.where(filter_conditions) if filter_conditions
+            rows_query = rows_query.where(query[:where]) if query[:where]
+            rows = rows_query.to_a
             filter_fields = search.filter[field.to_s]
             filter_fields&.each do |selected_value|
               next if rows.find { |r| r[:value].to_s == selected_value }
@@ -274,7 +275,8 @@ module SimpleDrilldown
                 ass_order_prefixed.gsub!(/\b#{cname}\b/, "#{include_alias}.#{cname}")
               end
               paranoid_clause = 'AND t2.deleted_at IS NULL' if ass.klass.paranoid?
-              # FIXME(uwe):  Should we add "where" from the ScopeHolder here as well?  Ref: DrilldownChanges#changes_for
+              # FIXME(uwe):  Should we add "where" from the ScopeHolder here as well?
+              #              Ref: SimpleDrilldown::Changes#changes_for
               min_query = <<~SQL
                 SELECT MIN(#{ass_order}) FROM #{include_table} t2 WHERE t2.#{fk_col} = #{model_table}.id #{paranoid_clause}
               SQL
@@ -347,8 +349,8 @@ module SimpleDrilldown
       rows = c_target_class.unscoped.where(c_base_condition).select(select).where(conditions)
                            .joins(joins)
                            .group(group)
-                           .order(order).to_a
-
+                           .order(order)
+                           .to_a
       if rows.empty?
         @result = { value: 'All', count: 0, row_count: 0, nodes: 0, rows: [] }
         c_summary_fields.each { |f| @result[f] = 0 }

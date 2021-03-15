@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20_200_620_065_126) do
     t.integer 'rating', null: false
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
+    t.datetime 'deleted_at'
     t.index ['post_id'], name: 'index_comments_on_post_id'
     t.index ['user_id'], name: 'index_comments_on_user_id'
   end
@@ -32,6 +33,7 @@ ActiveRecord::Schema.define(version: 20_200_620_065_126) do
     t.datetime 'published_at'
     t.datetime 'created_at', precision: 6, null: false
     t.datetime 'updated_at', precision: 6, null: false
+    t.datetime 'deleted_at'
     t.index ['user_id'], name: 'index_posts_on_user_id'
   end
 

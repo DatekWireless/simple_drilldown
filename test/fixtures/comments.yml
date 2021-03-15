@@ -11,3 +11,11 @@ two:
   title: MyString
   body: 
   rating: 1
+
+deleted:
+  post: two
+  user: two
+  title: Deleted Comment
+  body: This comment was poorly thought through, so I deleted it.
+  rating: 1
+  deleted_at: <%=1.hour.ago.iso8601%>

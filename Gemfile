@@ -18,6 +18,7 @@ gemspec
 
 group :test do
   gem 'capybara'
+  gem 'paranoia'
   gem 'puma'
   gem 'selenium-webdriver'
 end
