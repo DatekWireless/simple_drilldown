@@ -7,32 +7,39 @@ def excel_header_row(sheet)
   sheet.add_row row
 end
 
-def excel_row(sheet, transaction:)
+def excel_row(sheet, wrap, transaction:)
   padding_cells = @dimensions.empty? ? 1 : @dimensions.size
   row = (1..(padding_cells - 1)).map { |_n| nil }
 
   @search.fields.each_with_index do |field, _i|
     value = if field == 'time'
-              ((
-              if transaction.respond_to?(:completed_at)
-                transaction.completed_at
-              else
-                transaction.created_at
-              end)).localtime.strftime('%Y-%m-%d %H:%M')
+              (transaction.respond_to?(:completed_at) ? transaction.completed_at : transaction.created_at)
+                .localtime.strftime('%Y-%m-%d %H:%M')
             elsif controller.c_fields[field.to_sym][:attr_method]
               controller.c_fields[field.to_sym][:attr_method].call(transaction)
             else
               transaction.send(field)
             end
 
-    # field_def = controller.c_fields[field.to_sym]
+    field_def = controller.c_fields[field.to_sym]
+    if @search.list_change_times && field_def[:list_change_times] && transaction.assignment.try(:order)
+      changes = transaction.assignment.order.send("#{field}_changes")
+                           .map do |al|
+        [al.created_at.localtime.strftime('%H:%M'),
+         PacMan.yaml_load(al.new_values).symbolize_keys[field.to_sym]]
+      end
+      last_change = changes.last.try(:[], 1)
+      value =
+        "#{changes.map { |al| al.join(' ') }.join("\n")}#{"\nActual: #{value}" if value != last_change}"
+    end
 
     row << value
   end
-  sheet.add_row row
+  sheet.add_row row, style: wrap
 end
 
 sheet.add_row []
 excel_header_row(sheet)
-result[:records].each { |t| excel_row(sheet, transaction: t) }
+wrap = sheet.styles.add_style alignment: { wrap_text: true }
+result[:records].each { |t| excel_row(sheet, wrap, transaction: t) }
 sheet.add_row []

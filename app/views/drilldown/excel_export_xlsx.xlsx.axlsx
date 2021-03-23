@@ -37,6 +37,7 @@ def excel_summary_row_xlsx(sheet, result, parent_result = nil, dimension = 0, he
          })
 end
 
+xlsx_package.use_shared_strings = true
 wb = xlsx_package.workbook
 wb.add_worksheet(name: 'Transaction Summary') do |sheet|
   # header_colspan =
