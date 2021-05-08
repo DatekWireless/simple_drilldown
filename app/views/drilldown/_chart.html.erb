@@ -72,6 +72,7 @@
     value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
     console.log("Label: " + label + ", Value: " + value);
     new_location = window.location.toString();
+    new_location = new_location.replace(/#.*$/, '');
     new_location = new_location.replace("&search[dimensions][]=<%= @dimensions[0][:url_param_name] %>", '');
     new_location = new_location + '&search[filter][<%= @dimensions[0][:url_param_name] %>][]=' + label;
     console.log(new_location);
