@@ -1,19 +1,19 @@
 <%
   data =
-      case @dimensions.size
-      when 0
-        { @result[:value] => @result[:count] }
-      when 1
-        @result[:rows].map { |r| [@dimensions[0][:label_method] ? @dimensions[0][:label_method].call(r[:value]) : r[:value], r[:count]] }
-      when 2
-        @result[:rows].map do |r|
-          {
-                  name: r[:value],
-                  data: r[:rows].map { |r2| [r2[:value], r2[:count]] }
-          }
-        end
-      when 3
+    case @dimensions.size
+    when 0
+      { @result[:value] => @result[:count] }
+    when 1
+      @result[:rows].map { |r| [@dimensions[0][:label_method] ? @dimensions[0][:label_method].call(r[:value]) : r[:value], r[:count]] }
+    when 2
+      @result[:rows].map do |r|
+        {
+          name: r[:value],
+          data: r[:rows].map { |r2| [r2[:value], r2[:count]] }
+        }
       end
+    when 3
+    end
 %>
 
 <%
@@ -37,10 +37,10 @@
   <% (0..2).each do |i|
     options = [['', '']]
     options << [@dimensions[i][:pretty_name], @dimensions[i][:url_param_name]] if @dimensions[i]
-    options += @remaining_dimensions.keys.map { |name| [controller.c_dimension_defs[name][:pretty_name], name] }  %>
+    options += @remaining_dimensions.keys.map { |name| [controller.c_dimension_defs[name][:pretty_name], name] } %>
     <%= t(i == 0 ? :group_by : :then_by) %>:
     <%= form.select 'dimensions', options, { :selected => @search.dimensions && @search.dimensions[i] },
-        { onChange: 'form.submit()', name: 'search[dimensions][]', id: "search_dimensions_#{i}" } %>
+      { onChange: 'form.submit()', name: 'search[dimensions][]', id: "search_dimensions_#{i}" } %>
   <% end %>
 
   <br/>
@@ -62,21 +62,21 @@
 </div>
 
 <% if @dimensions.size == 1 &&
-    [SimpleDrilldown::Search::DisplayType::BAR, SimpleDrilldown::Search::DisplayType::PIE].include?(@search.display_type) %>
+  [SimpleDrilldown::Search::DisplayType::BAR, SimpleDrilldown::Search::DisplayType::PIE].include?(@search.display_type) %>
   <%= javascript_tag do %>
     $('#chart-1').on('click', function(e){
-      chart = Chartkick.charts['chart-1'].getChartObject();
-      firstPoint = chart.getElementsAtEvent(e)[0]
-      if (firstPoint) {
-        label = chart.data.labels[firstPoint._index];
-        value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-        console.log("Label: " + label + ", Value: " + value);
-        new_location = window.location.toString();
-        new_location = new_location.replace("&search[dimensions][]=<%= @dimensions[0][:url_param_name] %>", '');
-        new_location = new_location + '&search[filter][<%= @dimensions[0][:url_param_name] %>][]=' + label;
-        console.log(new_location);
-        window.location = new_location;
-      }
+    chart = Chartkick.charts['chart-1'].getChartObject();
+    firstPoint = chart.getElementsAtEvent(e)[0]
+    if (firstPoint) {
+    label = chart.data.labels[firstPoint._index];
+    value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+    console.log("Label: " + label + ", Value: " + value);
+    new_location = window.location.toString();
+    new_location = new_location.replace("&search[dimensions][]=<%= @dimensions[0][:url_param_name] %>", '');
+    new_location = new_location + '&search[filter][<%= @dimensions[0][:url_param_name] %>][]=' + label;
+    console.log(new_location);
+    window.location = new_location;
+    }
     });
   <% end %>
 <% end %>
