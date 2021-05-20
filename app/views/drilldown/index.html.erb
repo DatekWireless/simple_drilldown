@@ -43,7 +43,7 @@
         <div class="row">
           <div class="col-md-12" valign="top">
             <div style="float: right; clear: both;">
-              <%= render '/drilldown/export_links' %>
+              <%= render '/drilldown/export_links', records: @result[:records] %>
             </div>
             <%= render '/drilldown/summary_table' %>
           </div>
