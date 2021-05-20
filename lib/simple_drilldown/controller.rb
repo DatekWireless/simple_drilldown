@@ -45,8 +45,8 @@ module SimpleDrilldown
         self.c_base_condition = base_condition
       end
 
-      def base_includes(base_includes)
-        self.c_base_includes = base_includes
+      def base_includes(*base_includes)
+        self.c_base_includes = base_includes.flatten
       end
 
       def base_group(base_group)
@@ -69,7 +69,7 @@ module SimpleDrilldown
         self.c_select = select
       end
 
-      def list_includes(list_includes)
+      def list_includes(*list_includes)
         self.c_list_includes = list_includes.flatten
       end
 
@@ -192,9 +192,6 @@ module SimpleDrilldown
 
             values = Array(values)
             if dimension_def[:interval]
-              values *= 2 if values.size == 1
-              raise "Need 2 values for interval filter: #{values.inspect}" if values.size != 2
-
               if values[0].present? && values[1].present?
                 condition_strings << "#{dimension_def[:select_expression]} BETWEEN ? AND ?"
                 condition_values += values
@@ -263,7 +260,9 @@ module SimpleDrilldown
           include_alias = include.to_s.pluralize
           case ass.macro
           when :belongs_to
-            "LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.id = #{model_table}.#{include}_id"
+            pk_col = ass.association_primary_key
+            fk_col = ass.options[:foreign_key] || "#{include}_id"
+            "LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.#{pk_col} = #{model_table}.#{fk_col}"
           when :has_one, :has_many
             fk_col = ass.options[:foreign_key] || "#{model}_id"
             sql = +"LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.#{fk_col} = #{model_table}.id"
