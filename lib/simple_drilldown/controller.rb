@@ -128,7 +128,7 @@ module SimpleDrilldown
           interval: interval,
           label_method: label_method,
           legal_values: legal_values,
-          pretty_name: I18n.t(name, default: :"activerecord.models.#{name}"),
+          pretty_name: I18n.t(name, default: [:"activerecord.models.#{name}", name.to_s.titleize]),
           queries: queries,
           reverse: reverse,
           select_expression:
