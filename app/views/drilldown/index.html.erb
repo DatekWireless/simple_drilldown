@@ -1,16 +1,15 @@
-<% @page_title = "#{caption} #{subcaption}" %>
 <%= javascript_include_tag 'chartkick' %>
 <%= stylesheet_link_tag 'simple_drilldown/application' %>
-<style type="text/css">
-    table#drill_down_layout > tbody > tr > td {
-        border: none;
-        font-size: 13px
-    }
+<style>
+  table#drill_down_layout > tbody > tr > td {
+    border: none;
+    font-size: 13px
+  }
 
-    table#drill_down_layout td {
-        padding: 2px;
-        line-height: 18px
-    }
+  table#drill_down_layout td {
+    padding: 2px;
+    line-height: 18px
+  }
 </style>
 
 <%= form_for @search, html: { id: 'edit_search_SEARCH', method: :get, class: :search, style: 'background: inherit', onsubmit: 'return this.submit()' }, url: {} do |form| %>
@@ -26,11 +25,9 @@
         <!-- Tab panes -->
         <div class="tab-content">
           <div class="tab-pane active" id="filter">
-            <%= render '/drilldown/tab_buttons', form: form %>
             <%= render '/drilldown/filter', form: form  %>
           </div>
           <div class="tab-pane" id="fields">
-            <%= render '/drilldown/tab_buttons', form: form %>
             <%= render '/drilldown/fields', form: form %>
           </div>
         </div>
