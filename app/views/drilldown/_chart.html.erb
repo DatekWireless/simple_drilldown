@@ -68,10 +68,10 @@
   <%= javascript_tag do %>
     $('#chart-1').on('click', function(e){
     chart = Chartkick.charts['chart-1'].getChartObject();
-    firstPoint = chart.getElementsAtEvent(e)[0]
+    firstPoint = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false)[0]
     if (firstPoint) {
-    label = chart.data.labels[firstPoint._index];
-    value = chart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+    label = chart.data.labels[firstPoint.index];
+    value = chart.data.datasets[firstPoint.datasetIndex].data[firstPoint._index];
     console.log("Label: " + label + ", Value: " + value);
     new_location = window.location.toString();
     new_location = new_location.replace(/#.*$/, '');
