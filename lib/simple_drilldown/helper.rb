@@ -89,7 +89,8 @@ module SimpleDrilldown
     private
 
     def caption_txt
-      "#{controller.c_target_class} #{I18n.t(@search.select_value.downcase)}" +
+      "#{controller.c_target_class} #{I18n.t(@search.select_value.downcase,
+                                             default: @search.select_value.to_s.titleize)}" +
         (@dimensions && @dimensions.any? ? " by #{@dimensions.map { |d| d[:pretty_name] }.join(' and ')}" : '')
     end
   end
