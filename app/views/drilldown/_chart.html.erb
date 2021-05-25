@@ -2,14 +2,14 @@
   data =
     case @dimensions.size
     when 0
-      { @result[:value] => @result[:count] }
+      { @result[:value] => @result[@search.select_value] }
     when 1
-      @result[:rows].map { |r| [@dimensions[0][:label_method] ? @dimensions[0][:label_method].call(r[:value]) : r[:value], r[:count]] }
+      @result[:rows].map { |r| [@dimensions[0][:label_method] ? @dimensions[0][:label_method].call(r[:value]) : r[:value], r[@search.select_value]] }
     when 2
       @result[:rows].map do |r|
         {
           name: r[:value],
-          data: r[:rows].map { |r2| [r2[:value], r2[:count]] }
+          data: r[:rows].map { |r2| [r2[:value], r2[@search.select_value]] }
         }
       end
     when 3
@@ -55,6 +55,22 @@
   <%= form.label :display_type_line, t(:line) %>
   <%= form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::NONE, { :onChange => 'form.submit()' } %>
   <%= form.label :display_type_none, t(:none) %>
+
+  <% if controller.c_summary_fields.present? && @search.display_type != SimpleDrilldown::Search::DisplayType::NONE %>
+    <div class="text-center">
+      <label style="margin-bottom:0;margin-right:1em" for="search_select_value">Value: </label>
+      <div class="form-check form-check-inline">
+        <%= form.radio_button :select_value, SimpleDrilldown::Search::SelectValue::COUNT, class: "form-check-input", onChange: 'form.submit()' %>
+        <label class="form-check-label mr-3" for="search_select_value_count"><%= t(:count) %></label>
+      </div>
+      <% controller.c_summary_fields.each do |field| %>
+        <div class="form-check form-check-inline">
+          <%= form.radio_button :select_value, field, class: "form-check-input", onChange: 'form.submit()' %>
+          <label class="form-check-label mr-3" for="search_select_value_<%= field %>"><%= t(:field, default: field.to_s.titleize) %></label>
+        </div>
+      <% end %>
+    </div>
+<% end %>
 
   <%= form.check_box :order_by_value, { :onChange => 'form.submit()' } %>
   <%= form.label :order_by_value, t(:order_by_value) %>

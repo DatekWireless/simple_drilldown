@@ -1,3 +1,4 @@
+<% row_class = dimension > 0 && @dimensions[dimension - 1]&.[](:row_class)&.call(result[:value]) %>
 <% if new_row -%>
   <tr class="<%= cycle("odd", "even", :name => "dim#{dimension}") %>">
     <% ((dimension + 1)..(@dimensions.size)).each { |i| cycle("odd", "even", :name => "dim#{i}") if current_cycle("dim#{i}") != current_cycle("dim#{dimension}") } -%>
@@ -14,5 +15,13 @@
       (<%= 100 * result[:count] / parent_result[:count] %>%)
     <% end %>
   </td>
+  <% controller.c_summary_fields.each do |summary_field| %>
+    <td class="<%=row_class%>" align="right">
+      <%= result[summary_field] %>
+      <% if @search.percent && parent_result && parent_result[summary_field] > 0 %>
+        (<%= 100 * result[summary_field] / parent_result[summary_field] %>%)
+      <% end %>
+    </td>
+  <% end %>
   </tr>
 <% end %>

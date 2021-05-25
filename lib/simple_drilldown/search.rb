@@ -14,9 +14,7 @@ module SimpleDrilldown
     end
 
     module SelectValue
-      COUNT = 'COUNT'
-      VOLUME = 'VOLUME'
-      VOLUME_COMPENSATED = 'VOLUME_COMPENSATED'
+      COUNT = :count
     end
 
     attr_reader :dimensions, :display_type, :fields, :filter, :list_change_times, :order_by_value,
@@ -62,7 +60,7 @@ module SimpleDrilldown
         @display_type = DisplayType::BAR if @dimensions.size >= 2 && @display_type == DisplayType::PIE
 
         @order_by_value = attributes && (attributes[:order_by_value] == '1')
-        @select_value = attributes&.dig(:select_value).present? ? attributes[:select_value] : @default_select_value
+        @select_value = attributes&.dig(:select_value).presence&.to_sym || @default_select_value
         @list = attributes&.[](:list) == '1'
         @percent = attributes&.[](:percent) == '1'
         @list_change_times = attributes&.[](:list_change_times) == '1'

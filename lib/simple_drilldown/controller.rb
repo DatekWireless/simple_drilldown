@@ -58,7 +58,7 @@ module SimpleDrilldown
       end
 
       def default_select_value(default_select_value)
-        self.c_default_select_value = default_select_value
+        self.c_default_select_value = default_select_value.to_sym
       end
 
       def target_class(target_class)
@@ -327,16 +327,7 @@ module SimpleDrilldown
       includes.flatten!
       includes.keep_if(&:present?).uniq!
       if @search.order_by_value && @dimensions.size <= 1
-        order = case @search.select_value
-                when Search::SelectValue::VOLUME
-                  'volume DESC'
-                when Search::SelectValue::VOLUME_COMPENSATED
-                  'volume_compensated DESC'
-                when Search::SelectValue::COUNT
-                  'count DESC'
-                else
-                  'count DESC'
-                end
+        order = "#{c_summary_fields.find { |f| f == @search.select_value } || 'count'} DESC"
       else
         order = (1..@dimensions.size).map { |i| "value#{i}" }.join(',')
         order = nil if order.empty?
