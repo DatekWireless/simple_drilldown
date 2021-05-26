@@ -85,7 +85,15 @@ module SimpleDrilldown
         self.c_summary_fields = summary_fields.flatten
       end
 
-      def dimension(name, select_expression = name, options = {})
+      def dimension(name, select_expression = name.to_s, options = {})
+        if select_expression.is_a?(Hash)
+          unless options.blank?
+            raise "select_expression should be a string: #{select_expression.class}, options: #{options.inspect}"
+          end
+
+          options = select_expression
+          select_expression = name.to_s
+        end
         interval = options.delete(:interval)
         label_method = options.delete(:label_method)
         legal_values = options.delete(:legal_values) || legal_values_for(name)
