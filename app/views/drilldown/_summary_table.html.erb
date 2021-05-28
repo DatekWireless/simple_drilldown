@@ -1,14 +1,16 @@
-<table id="drilldown-summary-table" class="table table-sm table-bordered">
-  <thead>
-    <tr>
-      <% @dimensions.each do |d| %>
-        <th><%= h d[:pretty_name] %></th>
-      <% end %>
-      <th><%= t controller.c_target_class.table_name.capitalize %></th>
-      <%= controller.c_summary_fields.map { |l| "<th>#{t(l)}</th>" }.join("\n").html_safe %>
-    </tr>
-  </thead>
-  <tbody>
-    <%= summary_row(@result) %>
-  </tbody>
-</table>
+<div class="table-responsive">
+  <table id="drilldown-summary-table" class="table table-sm table-bordered">
+    <thead>
+      <tr>
+        <% @dimensions.each do |d| %>
+          <th><%= h d[:pretty_name] %></th>
+        <% end %>
+        <th><%= t controller.c_target_class.table_name.capitalize %></th>
+        <%= controller.c_summary_fields.map { |l| "<th>#{t(l)}</th>" }.join("\n").html_safe %>
+      </tr>
+    </thead>
+    <tbody>
+      <%= summary_row(@result) %>
+    </tbody>
+  </table>
+</div>
