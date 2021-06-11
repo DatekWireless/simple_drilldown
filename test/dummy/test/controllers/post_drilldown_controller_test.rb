@@ -17,7 +17,6 @@ class PostDrilldownControllerTest < ActionDispatch::IntegrationTest
   def test_should_get_index_with_list
     get post_drilldown_index_url params: { search: { list: 1 } }
     assert_response :success
-    puts response.body
     assert_select 'table#drilldown-summary-table > tbody > tr', count: 2
     assert_select <<~CSS.squish, '2'
       table#drilldown-summary-table > tbody > tr > td
