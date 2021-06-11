@@ -1,4 +1,12 @@
 <tr class="summary">
   <td colspan="<%= @dimensions.size - dimension %>"></td>
   <td align="right"><%= result[:count] %></td>
+  <% controller.c_summary_fields.each do |summary_field| %>
+    <td align="right">
+      <%= result[summary_field] %>
+      <% if @search.percent && parent_result && parent_result[summary_field] > 0 %>
+        (<%= 100 * result[summary_field] / parent_result[summary_field] %>%)
+      <% end %>
+    </td>
+  <% end %>
 </tr>
