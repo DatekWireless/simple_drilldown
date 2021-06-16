@@ -6,7 +6,7 @@
           </style>
 
         <% @transaction_fields.each do | field | %>
-          <%=form.label "fields[#{field}]", t(field, default: :"attributes.#{field}"), :class => "field_label" %>
-          <%=form.check_box :fields, :id => "search_fields[#{field}]", :name => "search[fields][#{field}]", :checked => @search.fields.include?(field) %>
+          <%=form.label "fields[#{field}]", t(field, default: [:"attributes.#{field}", field.humanize]), class: "field_label" %>
+          <%=form.check_box :fields, id: "search_fields[#{field}]", name: "search[fields][#{field}]", checked: @search.fields.include?(field) %>
           <br/>
         <% end %>
