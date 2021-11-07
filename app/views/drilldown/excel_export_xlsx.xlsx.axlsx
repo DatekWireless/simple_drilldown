@@ -11,7 +11,7 @@ def excel_summary_row_xlsx(sheet, result, parent_result = nil, dimension = 0, he
           else
             headers + [{
               value: result[:value],
-              display_row_count: result[:nodes] + result[:row_count] * (@search.list ? 1 : 0)
+              display_row_count: result[:nodes] + (result[:row_count] * (@search.list ? 1 : 0))
             }]
           end
         else

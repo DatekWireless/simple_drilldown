@@ -47,7 +47,7 @@ module SimpleDrilldown
         attributes = attributes_or_search
         @default_fields = default_fields
         @default_select_value = default_select_value
-        @dimensions = attributes && attributes[:dimensions] || []
+        @dimensions = (attributes && attributes[:dimensions]) || []
         @dimensions.delete_if(&:empty?)
         @filter = attributes && attributes[:filter] ? attributes[:filter] : {}
         @filter.keys.dup.each { |k| @filter[k] = Array(@filter[k]) }

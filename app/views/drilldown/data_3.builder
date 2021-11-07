@@ -5,7 +5,7 @@ xml.chart(
   caption: caption, subcaption: subcaption,
   showNames: '1',
   showValues:
-      @result[:rows].size > 15 || @result[:rows][0] && @result[:rows][0][:rows].size > 4 ? 0 : 1,
+      @result[:rows].size > 15 || (@result[:rows][0] && @result[:rows][0][:rows].size > 4) ? 0 : 1,
   decimals: '0',
   numberPrefix: '', clustered: '0', exeTime: '1.5', showPlotBorder: '0', zGapPlot: '30',
   zDepth: '90', divLineEffect: 'emboss', startAngX: '10', endAngX: '18', startAngY: '-10',

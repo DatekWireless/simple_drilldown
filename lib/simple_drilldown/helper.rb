@@ -31,7 +31,7 @@ module SimpleDrilldown
       if result[:rows]
         sub_headers = headers + [{
           value: result[:value],
-          display_row_count: result[:nodes] + result[:row_count] * (@search.list ? 1 : 0)
+          display_row_count: result[:nodes] + (result[:row_count] * (@search.list ? 1 : 0))
         }]
         significant_rows = result[:rows].reject { |r| r[:row_count].zero? }
         significant_rows.each_with_index do |r, i|
@@ -62,7 +62,7 @@ module SimpleDrilldown
               else
                 headers + [{
                   value: result[:value],
-                  display_row_count: result[:nodes] + result[:row_count] * (@search.list ? 1 : 0)
+                  display_row_count: result[:nodes] + (result[:row_count] * (@search.list ? 1 : 0))
                 }]
               end
             else
