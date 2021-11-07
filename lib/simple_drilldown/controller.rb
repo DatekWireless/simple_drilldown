@@ -267,8 +267,8 @@ module SimpleDrilldown
             fk_col = ass.options[:foreign_key] || "#{model}_id"
             sql = +"LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.#{fk_col} = #{model_table}.id"
             sql << " AND #{include_alias}.deleted_at IS NULL" if ass.klass.paranoid?
-            if ass.scope && (ass_order = ScopeHolder.new(ass.scope).to_s)
-              ass_order = ass_order.sub(/ DESC\s*$/i, '')
+            if ass.scope && (base_ass_order = ScopeHolder.new(ass.scope).to_s)
+              /^(?<ass_order>\S*)(?<ass_order_desc>\s+DESC)?/i =~ base_ass_order
               ass_order_prefixed = ass_order.dup
               ActiveRecord::Base.connection.columns(include_table).map(&:name).each do |cname|
                 ass_order_prefixed.gsub!(/\b#{cname}\b/, "#{include_alias}.#{cname}")
@@ -276,10 +276,10 @@ module SimpleDrilldown
               paranoid_clause = 'AND t2.deleted_at IS NULL' if ass.klass.paranoid?
               # FIXME(uwe):  Should we add "where" from the ScopeHolder here as well?
               #              Ref: SimpleDrilldown::Changes#changes_for
-              min_query = <<~SQL
-                SELECT MIN(#{ass_order}) FROM #{include_table} t2 WHERE t2.#{fk_col} = #{model_table}.id #{paranoid_clause}
+              aggregate_query = <<~SQL
+                SELECT #{ass_order_desc ? :MAX : :MIN}(#{ass_order}) FROM #{include_table} t2 WHERE t2.#{fk_col} = #{model_table}.id #{paranoid_clause}
               SQL
-              sql << " AND  #{ass_order_prefixed} = (#{min_query})"
+              sql << " AND  #{ass_order_prefixed} = (#{aggregate_query})"
             end
             sql
           else
