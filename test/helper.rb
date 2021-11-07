@@ -15,4 +15,5 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'simple_drilldown'
 
 class Test::Unit::TestCase
+  parallelize
 end

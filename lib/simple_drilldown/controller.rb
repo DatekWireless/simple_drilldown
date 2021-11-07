@@ -36,9 +36,7 @@ module SimpleDrilldown
             # No default target class found
           end
         end
-        return unless base.c_target_class.try :paranoid?
-
-        base.c_base_condition = "#{base.c_target_class.table_name}.deleted_at IS NULL"
+        base.update_base_condition
       end
 
       def base_condition(base_condition)
@@ -63,6 +61,7 @@ module SimpleDrilldown
 
       def target_class(target_class)
         self.c_target_class = target_class
+        update_base_condition
       end
 
       def select(select)
@@ -148,25 +147,18 @@ module SimpleDrilldown
 
       def legal_values_for(field, preserve_filter = false)
         lambda do |search|
-          my_filter = search.filter.dup
-          my_filter.delete(field.to_s) unless preserve_filter
-          filter_conditions, _t, includes = make_conditions(my_filter)
+          filter = search.filter.dup
+          filter.delete(field.to_s) unless preserve_filter
+          filter_conditions, _t, includes = make_conditions(filter)
           dimension_def = c_dimension_defs[field.to_s]
           result_sets = dimension_def[:queries].map do |query|
-            if query[:includes]
-              if query[:includes].is_a?(Array)
-                includes += query[:includes]
-              else
-                includes << query[:includes]
-              end
-              includes.uniq!
-            end
+            includes = merge_includes(includes, query[:includes]) if query[:includes]
             rows_query = c_target_class.unscoped.where(c_base_condition)
                                        .select("#{query[:select]} AS value")
                                        .joins(make_join([], c_target_class.name.underscore.to_sym, includes))
                                        .order('value')
                                        .group(:value)
-            # rows_query = rows_query.without_deleted if c_target_class.try :paranoid?
+            rows_query = rows_query.without_deleted if c_target_class.try :paranoid?
             rows_query = rows_query.where(filter_conditions) if filter_conditions
             rows_query = rows_query.where(query[:where]) if query[:where]
             rows = rows_query.to_a
@@ -300,6 +292,51 @@ module SimpleDrilldown
         else
           raise "Unknown join class: #{include.inspect}"
         end
+      end
+
+      def merge_includes(*args)
+        hash = hash_includes(*args)
+        result = hash.dup.map do |k, v|
+          if v.blank?
+            hash.delete(k)
+            k
+          end
+        end.compact
+        result << hash unless hash.blank?
+        case result.size
+        when 0
+          nil
+        when 1
+          result[0]
+        else
+          result
+        end
+      end
+
+      def hash_includes(*args)
+        args.inject({}) do |h, inc|
+          case inc
+          when Array
+            inc.each do |v|
+              h = hash_includes(h, v)
+            end
+          when Hash
+            inc.each do |k, v|
+              h[k] = merge_includes(h[k], v)
+            end
+          when NilClass, FalseClass
+            # Leave as it is
+          when String, Symbol
+            h[inc] ||= []
+          else
+            raise "Unknown include type: #{inc.inspect}"
+          end
+          h
+        end
+      end
+
+      def update_base_condition
+        self.c_base_condition = "#{c_target_class.table_name}.deleted_at IS NULL" if c_target_class.try :paranoid?
       end
     end
 
@@ -535,7 +572,7 @@ module SimpleDrilldown
     def populate_list(conditions, includes, result, values)
       return result[:rows].each { |r| populate_list(conditions, includes, r, values + [r[:value]]) } if result[:rows]
 
-      list_includes = merge_includes(includes, c_list_includes)
+      list_includes = self.class.merge_includes(includes, c_list_includes)
       @search.fields.each do |field|
         field_def = c_fields[field.to_sym]
         raise "Field definition missing for: #{field.inspect}" unless field_def
@@ -555,47 +592,6 @@ module SimpleDrilldown
       base_query = c_target_class.unscoped.where(c_base_condition).joins(joins).order(c_list_order)
       base_query = base_query.where(list_conditions) if list_conditions
       result[:records] = base_query.to_a
-    end
-
-    def merge_includes(*args)
-      hash = hash_includes(*args)
-      result = hash.dup.map do |k, v|
-        if v.blank?
-          hash.delete(k)
-          k
-        end
-      end.compact
-      result << hash unless hash.blank?
-      case result.size
-      when 0
-        nil
-      when 1
-        result[0]
-      else
-        result
-      end
-    end
-
-    def hash_includes(*args)
-      args.inject({}) do |h, inc|
-        case inc
-        when Array
-          inc.each do |v|
-            h = hash_includes(h, v)
-          end
-        when Hash
-          inc.each do |k, v|
-            h[k] = merge_includes(h[k], v)
-          end
-        when NilClass, FalseClass
-          # Leave as it is
-        when String, Symbol
-          h[inc] ||= []
-        else
-          raise "Unknown include type: #{inc.inspect}"
-        end
-        h
-      end
     end
 
     def list_conditions(conditions, values)

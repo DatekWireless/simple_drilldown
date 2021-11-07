@@ -2,23 +2,23 @@
 
 require 'test_helper'
 
-class PostDrilldownControllerTest < ActionDispatch::IntegrationTest
+class AdvancedPostDrilldownControllerTest < ActionDispatch::IntegrationTest
   setup { @post = posts(:one) }
 
   test 'should get index' do
-    get post_drilldown_url
+    get advanced_post_drilldown_url
     assert_response :success
     assert_select 'table#drilldown-summary-table > tbody > tr', count: 1
-    assert_select <<~CSS.squish, '2'
-      table#drilldown-summary-table > tbody > tr > td
-    CSS
+    assert_select 'table#drilldown-summary-table > tbody > tr > td', '2', response.body
   end
 
   def test_should_get_index_with_list
-    get post_drilldown_url params: { search: { list: 1 } }
+    get advanced_post_drilldown_url params: { search: { list: 1 } }
     assert_response :success
     assert_select 'table#drilldown-summary-table > tbody > tr', count: 2
-    assert_select 'table#drilldown-summary-table > tbody > tr > td', '2'
+    assert_select <<~CSS.squish, '2'
+      table#drilldown-summary-table > tbody > tr > td
+    CSS
     assert_select 'table#drilldown-summary-table > tbody > tr table#drilldown-records-All', count: 1
     assert_select <<~CSS.squish, count: 2
       table#drilldown-summary-table > tbody > tr table#drilldown-records-All > tbody > tr
