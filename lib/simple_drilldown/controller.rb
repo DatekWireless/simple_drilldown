@@ -578,12 +578,12 @@ module SimpleDrilldown
         raise "Field definition missing for: #{field.inspect}" unless field_def
 
         field_includes = field_def[:include]
-        list_includes = merge_includes(list_includes, field_includes) if field_includes
+        list_includes = self.class.merge_includes(list_includes, field_includes) if field_includes
       end
       if @search.list_change_times
         @history_fields.each do |f|
           if @search.fields.include? f
-            list_includes = merge_includes(list_includes, assignment: { order: :"#{f}_changes" })
+            list_includes = self.class.merge_includes(list_includes, assignment: { order: :"#{f}_changes" })
           end
         end
       end
