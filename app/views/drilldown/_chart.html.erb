@@ -46,7 +46,7 @@
   <% end %>
 
   <br/>
-  <%= t :chart_type %>
+  <%= t :chart_type %>:
   <%= form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::BAR, { :onChange => 'form.submit()' } %>
   <%= form.label :display_type_bar, t(:bar) %>
   <%= form.radio_button 'display_type', SimpleDrilldown::Search::DisplayType::PIE, { :disabled => @search.dimensions.size >= 2, :onChange => 'form.submit()' } %>
