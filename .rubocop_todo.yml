@@ -41,7 +41,7 @@ Metrics/CyclomaticComplexity:
 # Offense count: 20
 # Configuration parameters: CountComments, CountAsOne, ExcludedMethods, IgnoredMethods.
 Metrics/MethodLength:
-  Max: 54
+  Max: 56
 
 # Offense count: 1
 # Configuration parameters: Max, CountKeywordArgs.
@@ -70,7 +70,8 @@ Style/Documentation:
     - 'test/**/*'
     - 'app/helpers/simple_drilldown/application_helper.rb'
     - 'app/models/simple_drilldown/application_record.rb'
-    - 'lib/generators/drilldown_controller/drilldown_controller_generator.rb'
+    - 'lib/generators/simple_drilldown/controller/controller_generator.rb'
+    - 'lib/generators/simple_drilldown/views/views_generator.rb'
     - 'lib/simple_drilldown.rb'
     - 'lib/simple_drilldown/controller.rb'
     - 'lib/simple_drilldown/engine.rb'

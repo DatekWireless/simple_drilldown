@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 require 'test_helper'
-require 'generators/simple_drilldown/controller/controller_generator'
+require 'generators/simple_drilldown/views/views_generator'
 
 module SimpleDrilldown
-  class DrilldownControllerGeneratorTest < Rails::Generators::TestCase
-    tests ControllerGenerator
+  class DrilldownViewsGeneratorTest < Rails::Generators::TestCase
+    tests ViewsGenerator
     destination Rails.root.join('tmp/generators')
     setup :prepare_destination
 

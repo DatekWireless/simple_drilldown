@@ -18,7 +18,9 @@ gemspec
 
 group :test do
   gem 'capybara'
+  gem 'net-smtp'
   gem 'paranoia'
   gem 'puma'
   gem 'selenium-webdriver'
+  gem 'webdrivers'
 end

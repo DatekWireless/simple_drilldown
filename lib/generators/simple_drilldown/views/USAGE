@@ -1,0 +1,9 @@
+Description:
+    Generate drilldown views.
+
+Example:
+    bin/rails generate simple_drilldown:views
+
+    This will create:
+        app/views/drilldown
+        app/views/layouts/drilldown

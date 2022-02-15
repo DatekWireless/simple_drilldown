@@ -66,7 +66,7 @@ end
 Create a new controller to focus on posts.  Each drilldown controller focuses on
 one main entity.
 
-    bin/rails g drilldown_controller User
+    bin/rails g simple_drilldown:controller User
 
 ```ruby
 class PostsDrilldownController < DrilldownController
@@ -115,8 +115,12 @@ results.
 
 ### Views
 
-You need the following views:
+This gem includes views for the drilldown visualization using Bootstrap.
 
+You can override any views by creating them in your `app/views/drilldown` directory.
+If you would like a local copy of the views for overriding you can use the generator.
+
+    bin/rails g simple_drilldown:views
 
 
 ## Excel export

@@ -41,7 +41,7 @@
     options << [@dimensions[i][:pretty_name], @dimensions[i][:url_param_name]] if @dimensions[i]
     options += @remaining_dimensions.keys.map { |name| [controller.c_dimension_defs[name][:pretty_name], name] } %>
     <%= t(i == 0 ? :group_by : :then_by) %>:
-    <%= form.select 'dimensions', options, { :selected => @search.dimensions && @search.dimensions[i] },
+    <%= form.select 'dimensions', options.sort, { :selected => @search.dimensions && @search.dimensions[i] },
       { onChange: 'form.submit()', name: 'search[dimensions][]', id: "search_dimensions_#{i}" } %>
   <% end %>
 

@@ -2,7 +2,7 @@ Description:
     Create a DrilldownController.
 
 Example:
-    rails generate drilldown_controller Thing
+    rails generate simple_drilldown:controller Thing
 
     This will create:
         app/controllers/thing_drilldown_controller.rb
