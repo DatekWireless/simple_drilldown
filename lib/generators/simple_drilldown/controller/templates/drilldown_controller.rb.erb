@@ -26,7 +26,7 @@ class <%= class_name %>DrilldownController < SimpleDrilldown::Controller
   # base_includes :user, :comments # TODO(uwe): Read relations from schema?
 
   # What fields should be displayed as default when listing actual <%= class_name %> records.
-  default_fields %w[created_at updated_at] # TODO(uwe): Read fields from schema?
+  default_fields %w[id created_at updated_at] # TODO(uwe): Read fields from schema?
 
   # When listing records, what relations should be included for optimization?
   # list_includes :user, :comments # TODO(uwe): Read relations from schema?
@@ -35,6 +35,7 @@ class <%= class_name %>DrilldownController < SimpleDrilldown::Controller
   list_order '<%= plural_name %>.created_at'
 
   # Field definitions when listing records
+  field :id
   field :created_at
   field :updated_at
 
