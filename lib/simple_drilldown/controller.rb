@@ -270,7 +270,7 @@ module SimpleDrilldown
             sql = +"LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.#{fk_col} = #{model_table}.id"
             sql << " AND #{include_alias}.deleted_at IS NULL" if ass.klass.paranoid?
             if ass.scope && (base_ass_order = ScopeHolder.new(ass.scope).to_s)
-              /^(?<ass_order>\S*)(?<ass_order_desc>\s+DESC)?/i =~ base_ass_order
+              /^(?<ass_order>.*?)(?<ass_order_desc>\s+DESC)?$/i =~ base_ass_order
               ass_order_prefixed = ass_order.dup
               ActiveRecord::Base.connection.columns(include_table).map(&:name).each do |cname|
                 ass_order_prefixed.gsub!(/\b#{cname}\b/, "#{include_alias}.#{cname}")
@@ -383,11 +383,9 @@ module SimpleDrilldown
       group = nil if group.empty?
 
       joins = self.class.make_join([], c_target_class.name.underscore.to_sym, includes)
-      rows = c_target_class.unscoped.where(c_base_condition).select(select).where(conditions)
-                           .joins(joins)
-                           .group(group)
-                           .order(order)
-                           .to_a
+      row_query = c_target_class.unscoped.where(c_base_condition).select(select)
+      row_query = row_query.where(conditions) if conditions
+      rows = row_query.joins(joins).group(group).order(order).to_a
       if rows.empty?
         @result = { value: 'All', count: 0, row_count: 0, nodes: 0, rows: [] }
         c_summary_fields.each { |f| @result[f] = 0 }
