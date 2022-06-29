@@ -148,8 +148,8 @@ class UserDrilldownControllerTest < ActionDispatch::IntegrationTest
       filter: {
         calendar_date: %w[2009-01-01 2009-03-30],
         month: ['10'],
-        year: ['Person One'],
-      },
+        year: ['Person One']
+      }
     } }
     assert_response :success
   end

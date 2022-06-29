@@ -458,7 +458,7 @@ module SimpleDrilldown
 
     def set_excel_headers
       headers['Content-Type'] = 'application/vnd.ms-excel'
-      headers['Content-Disposition'] = %{attachment; filename="#{c_target_class.table_name}.xml"}
+      headers['Content-Disposition'] = %(attachment; filename="#{c_target_class.table_name}.xml")
       headers['Cache-Control'] = ''
     end
 

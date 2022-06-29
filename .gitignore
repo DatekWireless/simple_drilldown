@@ -1,6 +1,6 @@
 .bundle/
 /.idea/
-Gemfile.lock
+gems.locked
 log/*.log
 pkg/
 test/dummy/db/*.sqlite3

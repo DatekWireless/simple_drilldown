@@ -73,14 +73,6 @@ Style/Documentation:
 
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: literals, strict
-Style/MutableConstant:
-  Exclude:
-    - 'lib/simple_drilldown/version.rb'
-
-# Offense count: 1
-# This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: EnforcedStyle, IgnoredMethods.
 # SupportedStyles: predicate, comparison
 Style/NumericPredicate:
@@ -95,13 +87,6 @@ Style/OptionalBooleanParameter:
   Exclude:
     - 'lib/simple_drilldown/controller.rb'
     - 'lib/simple_drilldown/helper.rb'
-
-# Offense count: 1
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: PreferredDelimiters.
-Style/PercentLiteralDelimiters:
-  Exclude:
-    - 'lib/simple_drilldown/controller.rb'
 
 # Offense count: 1
 # This cop supports safe autocorrection (--autocorrect).
@@ -123,21 +108,3 @@ Style/SpecialGlobalVars:
 Style/StderrPuts:
   Exclude:
     - 'test/helper.rb'
-
-# Offense count: 2
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle, ConsistentQuotesInMultiline.
-# SupportedStyles: single_quotes, double_quotes
-Style/StringLiterals:
-  Exclude:
-    - 'test/helper.rb'
-    - 'test/simple_drilldown_test.rb'
-
-# Offense count: 4
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyleForMultiline.
-# SupportedStylesForMultiline: comma, consistent_comma, no_comma
-Style/TrailingCommaInHashLiteral:
-  Exclude:
-    - 'lib/simple_drilldown/search.rb'
-    - 'test/dummy/test/controllers/user_drilldown_controller_test.rb'

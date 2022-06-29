@@ -86,8 +86,8 @@ module SimpleDrilldown
           list_change_times: list_change_times ? '1' : '0',
           filter: filter,
           dimensions: dimensions,
-          display_type: display_type,
-        },
+          display_type: display_type
+        }
       }
       o[:search][:fields] = fields unless fields == @default_fields
       o
