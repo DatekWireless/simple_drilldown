@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.summary     = 'Simple data warehouse and drilldown.'
   spec.description = 'simple_drilldown offers a simple way to define axis to filter and group records for analysis.'
   spec.license     = 'MIT'
-  spec.required_ruby_version = '>=2.5'
+  spec.required_ruby_version = '>=2.6'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
@@ -29,11 +29,4 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'caxlsx_rails', '~>0.6'
   spec.add_dependency 'chartkick', '~>4.0'
   spec.add_dependency 'rails', '>=6.1', '<8'
-
-  spec.add_development_dependency 'rubocop', '~>1.1'
-  if RUBY_ENGINE == 'jruby'
-    spec.add_development_dependency 'activerecord-jdbcsqlite3-adapter'
-  else
-    spec.add_development_dependency 'sqlite3'
-  end
 end

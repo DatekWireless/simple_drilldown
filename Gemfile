@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 source 'https://rubygems.org'
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # Declare your gem's dependencies in simple_drilldown.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
@@ -16,11 +15,18 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+group :development, :test do
+  gem 'activerecord-jdbcsqlite3-adapter', '>=61', platform: :jruby
+  gem 'sqlite3', platform: :ruby
+end
+
 group :test do
   gem 'capybara'
   gem 'net-smtp'
   gem 'paranoia'
   gem 'puma'
+  gem 'rubocop'
   gem 'selenium-webdriver'
+  gem 'sprockets-rails'
   gem 'webdrivers'
 end

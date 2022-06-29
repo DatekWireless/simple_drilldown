@@ -601,7 +601,7 @@ module SimpleDrilldown
       @dimensions.each do |d|
         list_conditions_string << "#{' AND ' unless list_conditions_string.empty?}#{d[:select_expression]} = ?"
       end
-      [list_conditions_string, *(conditions[1..-1] + values)]
+      [list_conditions_string, *(conditions[1..] + values)]
     end
 
     def get_records(tree)

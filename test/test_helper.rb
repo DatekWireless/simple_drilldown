@@ -21,6 +21,6 @@ end
 
 module ActiveSupport
   class TestCase
-    parallelize
+    parallelize if Kernel.respond_to?(:fork)
   end
 end

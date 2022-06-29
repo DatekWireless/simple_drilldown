@@ -26,7 +26,7 @@ RuboCop::RakeTask.new
 
 namespace :test do
   desc 'Run Rubocop and all tests'
-  task full: %i[rubocop:auto_correct test]
+  task full: %i[rubocop:autocorrect_all test]
 
   desc 'Run all tests except system tests'
   task quick: :test
