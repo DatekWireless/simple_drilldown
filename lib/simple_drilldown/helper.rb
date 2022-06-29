@@ -23,7 +23,7 @@ module SimpleDrilldown
       @search.title || @filter_text.blank? ? '' : "for #{@filter_text}"
     end
 
-    def summary_row(result, parent_result = nil, dimension = 0, headers = [], new_row = true)
+    def summary_row(result, parent_result = nil, dimension = 0, headers = [], new_row: true)
       html = render(partial: '/simple_drilldown/summary_row', locals: {
                       result: result, parent_result: parent_result, new_row: new_row, dimension: dimension,
                       headers: headers, with_results: !result[:rows]
@@ -35,7 +35,7 @@ module SimpleDrilldown
         }]
         significant_rows = result[:rows].reject { |r| r[:row_count].zero? }
         significant_rows.each_with_index do |r, i|
-          html << summary_row(r, result, dimension + 1, sub_headers, i.positive?)
+          html << summary_row(r, result, dimension + 1, sub_headers, new_row: i.positive?)
         end
       elsif @search.list
         html << render(partial: '/simple_drilldown/record_list', locals: { result: result, dimension: dimension })

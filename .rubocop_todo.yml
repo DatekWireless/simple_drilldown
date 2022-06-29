@@ -25,7 +25,7 @@ Metrics/BlockNesting:
 # Offense count: 2
 # Configuration parameters: CountComments, CountAsOne.
 Metrics/ClassLength:
-  Max: 526
+  Max: 527
 
 # Offense count: 14
 # Configuration parameters: IgnoredMethods.
@@ -37,20 +37,7 @@ Metrics/CyclomaticComplexity:
 Metrics/MethodLength:
   Max: 56
 
-# Offense count: 1
-# Configuration parameters: Max, CountKeywordArgs.
-Metrics/ParameterLists:
-  MaxOptionalParameters: 4
-
 # Offense count: 13
 # Configuration parameters: IgnoredMethods.
 Metrics/PerceivedComplexity:
   Max: 33
-
-# Offense count: 3
-# Configuration parameters: AllowedMethods.
-# AllowedMethods: respond_to_missing?
-Style/OptionalBooleanParameter:
-  Exclude:
-    - 'lib/simple_drilldown/controller.rb'
-    - 'lib/simple_drilldown/helper.rb'

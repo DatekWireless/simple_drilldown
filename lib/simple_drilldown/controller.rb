@@ -147,7 +147,7 @@ module SimpleDrilldown
         }
       end
 
-      def legal_values_for(field, preserve_filter = false)
+      def legal_values_for(field, preserve_filter: false)
         lambda do |search|
           filter = search.filter.dup
           filter.delete(field.to_s) unless preserve_filter
@@ -349,7 +349,7 @@ module SimpleDrilldown
 
     # ?dimension[0]=supplier&dimension[1]=transaction_type&
     # filter[year]=2009&filter[supplier][0]=Shell&filter[supplier][1]=Statoil
-    def index(do_render = true)
+    def index(do_render: true)
       @search = new_search_object
 
       @transaction_fields = (@search.fields + (c_fields.keys.map(&:to_s) - @search.fields))
@@ -426,12 +426,12 @@ module SimpleDrilldown
     end
 
     def html_export
-      index(false)
+      index(do_render: false)
       render template: '/simple_drilldown/html_export', layout: 'simple_drilldown/print'
     end
 
     def excel_export
-      index(false)
+      index(do_render: false)
       respond_to do |format|
         format.xlsx do
           render xlsx: c_target_class.table_name, template: 'simple_drilldown/excel_export_xlsx'
@@ -503,7 +503,8 @@ module SimpleDrilldown
     # Empty summary rows are needed to plot zero points in the charts
     def add_zero_results(result_rows, dimension)
       legal_values =
-        self.class.legal_values_for(@dimensions[dimension][:url_param_name], true).call(@search).map { |lv| lv[1] }
+        self.class.legal_values_for(@dimensions[dimension][:url_param_name],
+                                    preserve_filter: true).call(@search).map { |lv| lv[1] }
       legal_values.reverse! if @dimensions[dimension][:reverse]
       current_values = result_rows.map { |r| r[:value] }.compact
       empty_values = legal_values - current_values
