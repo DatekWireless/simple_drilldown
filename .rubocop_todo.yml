@@ -56,21 +56,6 @@ Style/ClassAndModuleChildren:
     - 'test/helper.rb'
     - 'test/simple_drilldown_test.rb'
 
-# Offense count: 9
-# Configuration parameters: AllowedConstants.
-Style/Documentation:
-  Exclude:
-    - 'spec/**/*'
-    - 'test/**/*'
-    - 'app/helpers/simple_drilldown/application_helper.rb'
-    - 'app/models/simple_drilldown/application_record.rb'
-    - 'lib/generators/simple_drilldown/controller/controller_generator.rb'
-    - 'lib/generators/simple_drilldown/views/views_generator.rb'
-    - 'lib/simple_drilldown.rb'
-    - 'lib/simple_drilldown/controller.rb'
-    - 'lib/simple_drilldown/engine.rb'
-    - 'lib/simple_drilldown/search.rb'
-
 # Offense count: 3
 # Configuration parameters: AllowedMethods.
 # AllowedMethods: respond_to_missing?
