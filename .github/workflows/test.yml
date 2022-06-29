@@ -9,7 +9,7 @@ on:
 jobs:
   matrix:
     name: Test Integration Rails & Ruby
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
