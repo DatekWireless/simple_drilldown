@@ -477,18 +477,16 @@ module SimpleDrilldown
       removed_rows = 0
       prev_row = nil
       rows.each do |r|
-        if prev_row
-          if prev_row[:value] == r[:value]
-            prev_row[:count] += r[:count]
-            c_summary_fields.each do |f|
-              prev_row[f] += r[f]
-            end
-            prev_row[:row_count] = [prev_row[:row_count], r[:row_count]].max
-            prev_row[:nodes] = [prev_row[:nodes], r[:nodes]].max
-            prev_row[:rows] += r[:rows] if prev_row[:rows] || r[:rows]
-            r[:value] = nil
-            removed_rows += r[:nodes]
+        if prev_row && (prev_row[:value] == r[:value])
+          prev_row[:count] += r[:count]
+          c_summary_fields.each do |f|
+            prev_row[f] += r[f]
           end
+          prev_row[:row_count] = [prev_row[:row_count], r[:row_count]].max
+          prev_row[:nodes] = [prev_row[:nodes], r[:nodes]].max
+          prev_row[:rows] += r[:rows] if prev_row[:rows] || r[:rows]
+          r[:value] = nil
+          removed_rows += r[:nodes]
         end
         prev_row = r unless r[:value].nil?
       end
