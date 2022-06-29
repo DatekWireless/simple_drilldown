@@ -9,20 +9,14 @@ module SimpleDrilldown
 
     test 'subcaption blank' do
       @search = Search.new({})
-      assert_equal ' Count', caption
-      assert_equal '', subcaption
-    end
-
-    test 'subcaption no title' do
-      @search = Search.new({})
-      assert_equal ' Count', caption
+      assert_equal 'Simple Drilldown/Application Record Count', caption
       assert_equal '', subcaption
     end
 
     test 'subcaption with filter text' do
       @search = Search.new({})
       @filter_text = 'Subcaption'
-      assert_equal ' Count', caption
+      assert_equal 'Simple Drilldown/Application Record Count', caption
       assert_equal 'for Subcaption', subcaption
     end
 
@@ -36,7 +30,10 @@ module SimpleDrilldown
     private
 
     def controller
-      @controller ||= Controller.new
+      return @controller if @controller
+
+      Controller.target_class ApplicationRecord
+      @controller = Controller.new
     end
   end
 end

@@ -90,9 +90,9 @@ module SimpleDrilldown
 
     def caption_txt
       class_txt = controller.c_target_class &&
-                  I18n.t(controller.c_target_class.name.pluralize.to_sym,
-                         default: [controller.c_target_class.name.downcase.pluralize.to_sym,
-                                   controller.c_target_class.name.pluralize])
+                  I18n.t(controller.c_target_class.name.underscore.to_sym,
+                         default: [controller.c_target_class.name.underscore.to_sym,
+                                   controller.c_target_class.name.titleize])
       value_txt = I18n.t(@search.select_value.downcase, default: @search.select_value.to_s.titleize)
       dimensions_txt = " by #{@dimensions.map { |d| d[:pretty_name] }.join(' and ')}" if @dimensions&.any?
       "#{class_txt} #{value_txt}#{dimensions_txt}"
