@@ -9,7 +9,6 @@ on:
 jobs:
   matrix:
     name: Test Integration Rails & Ruby
-    needs: [ 'test' ]
     runs-on: ubuntu-22.04
 
     strategy:
