@@ -47,15 +47,6 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Max: 33
 
-# Offense count: 2
-# This cop supports unsafe autocorrection (--autocorrect-all).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: nested, compact
-Style/ClassAndModuleChildren:
-  Exclude:
-    - 'test/helper.rb'
-    - 'test/simple_drilldown_test.rb'
-
 # Offense count: 3
 # Configuration parameters: AllowedMethods.
 # AllowedMethods: respond_to_missing?

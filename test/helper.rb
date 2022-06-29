@@ -16,6 +16,10 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'simple_drilldown'
 
-class Test::Unit::TestCase
-  parallelize
+module Test
+  module Unit
+    class TestCase
+      parallelize
+    end
+  end
 end
