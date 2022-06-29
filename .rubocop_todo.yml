@@ -71,17 +71,6 @@ Style/Documentation:
     - 'lib/simple_drilldown/engine.rb'
     - 'lib/simple_drilldown/search.rb'
 
-# Offense count: 4
-# This cop supports unsafe autocorrection (--autocorrect-all).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: always, always_true, never
-Style/FrozenStringLiteralComment:
-  Exclude:
-    - 'lib/simple_drilldown/version.rb'
-    - 'simple_drilldown.gemspec'
-    - 'test/helper.rb'
-    - 'test/simple_drilldown_test.rb'
-
 # Offense count: 1
 # This cop supports unsafe autocorrection (--autocorrect-all).
 # Configuration parameters: EnforcedStyle.
