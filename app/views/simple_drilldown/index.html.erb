@@ -26,10 +26,10 @@
         <!-- Tab panes -->
         <div class="tab-content">
           <div class="tab-pane active" id="filter">
-            <%= render '/drilldown/filter', form: form  %>
+            <%= render '/simple_drilldown/filter', form: form  %>
           </div>
           <div class="tab-pane" id="fields">
-            <%= render '/drilldown/fields', form: form %>
+            <%= render '/simple_drilldown/fields', form: form %>
           </div>
         </div>
 
@@ -37,16 +37,16 @@
       <div class="col-md-9">
         <div class="row" valign="top">
           <div class="col-md-12">
-            <%= render '/drilldown/chart', form: form %>
+            <%= render '/simple_drilldown/chart', form: form %>
           </div>
         </div>
 
         <div class="row">
           <div class="col-md-12" valign="top">
             <div style="float: right; clear: both;">
-              <%= render '/drilldown/export_links', records: @result[:records] %>
+              <%= render '/simple_drilldown/export_links', records: @result[:records] %>
             </div>
-            <%= render '/drilldown/summary_table' %>
+            <%= render '/simple_drilldown/summary_table' %>
           </div>
         </div>
       </div>

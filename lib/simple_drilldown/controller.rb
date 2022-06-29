@@ -135,8 +135,8 @@ module SimpleDrilldown
           interval: interval,
           label_method: label_method,
           legal_values: legal_values,
-          pretty_name: I18n.t(:"drilldown.dimension.#{name}",
-                              default: [:"drilldown.#{name}", :"activerecord.models.#{name}", name.to_sym,
+          pretty_name: I18n.t(:"simple_drilldown.dimension.#{name}",
+                              default: [:"simple_drilldown.#{name}", :"activerecord.models.#{name}", name.to_sym,
                                         name.to_s.titleize]),
           queries: queries,
           reverse: reverse,
@@ -408,7 +408,7 @@ module SimpleDrilldown
       end
 
       populate_list(conditions, includes, @result, []) if @search.list
-      render template: '/drilldown/index' if do_render
+      render template: '/simple_drilldown/index' if do_render
     end
 
     def choices
@@ -427,22 +427,22 @@ module SimpleDrilldown
 
     def html_export
       index(false)
-      render template: '/drilldown/html_export', layout: '../drilldown/print'
+      render template: '/simple_drilldown/html_export', layout: 'simple_drilldown/print'
     end
 
     def excel_export
       index(false)
       respond_to do |format|
         format.xlsx do
-          render xlsx: c_target_class.table_name, template: 'drilldown/excel_export_xlsx'
+          render xlsx: c_target_class.table_name, template: 'simple_drilldown/excel_export_xlsx'
         end
         format.xml do
           set_excel_headers
           if params.dig(:search, :list) == '1'
             @records = get_records(@result)
-            render template: 'drilldown/excel_export_records', layout: false
+            render template: 'simple_drilldown/excel_export_records', layout: false
           else
-            render template: 'drilldown/excel_export', layout: false
+            render template: 'simple_drilldown/excel_export', layout: false
           end
         end
       end

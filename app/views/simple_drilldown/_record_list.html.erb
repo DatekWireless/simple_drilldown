@@ -2,10 +2,10 @@
   <tr>
     <td colspan="<%= controller.c_summary_fields.size + 1 %>">
       <table id="drilldown-records-<%= result[:value] %>" class="table table-condensed table-bordered" style="padding-bottom: 10px;">
-        <%= render '/drilldown/row_header', records: result[:records] %>
+        <%= render '/simple_drilldown/row_header', records: result[:records] %>
         <tbody>
           <% result[:records].each do |t| %>
-            <%= render :partial => '/drilldown/row', :locals => { :transaction => t, :previous_transaction => nil, :errors => [], :error_row => false, :meter1_errors => false } %>
+            <%= render :partial => '/simple_drilldown/row', :locals => { :transaction => t, :previous_transaction => nil, :errors => [], :error_row => false, :meter1_errors => false } %>
           <% end %>
         </tbody>
       </table>

@@ -4,7 +4,7 @@
       <th><%= t field, default: [:"attributes.#{field}", field.humanize] %></th>
     <% end %>
     <th>
-      <%= render 'drilldown/export_links', records: records %>
+      <%= render 'simple_drilldown/export_links', records: records %>
     </th>
   </tr>
 </thead>

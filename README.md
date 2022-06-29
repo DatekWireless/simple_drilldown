@@ -117,7 +117,7 @@ results.
 
 This gem includes views for the drilldown visualization using Bootstrap.
 
-You can override any views by creating them in your `app/views/drilldown` directory.
+You can override any views by creating them in your `app/views/simple_drilldown` directory.
 If you would like a local copy of the views for overriding you can use the generator.
 
     bin/rails g simple_drilldown:views

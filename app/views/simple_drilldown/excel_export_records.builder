@@ -10,7 +10,7 @@ xml.Workbook(
   'xmlns:ss' => 'urn:schemas-microsoft-com:office:spreadsheet',
   'xmlns:html' => 'http://www.w3.org/TR/REC-html40'
 ) do
-  xml << render(partial: '/drilldown/excel_styles')
+  xml << render(partial: '/simple_drilldown/excel_styles')
 
   xml.Worksheet 'ss:Name' => 'Drilldown' do
     xml.Table do

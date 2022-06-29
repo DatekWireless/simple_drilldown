@@ -8,7 +8,7 @@ xml.Row do
       xml.Data value_label(@dimensions.size - headers.size + i - 1, h[:value]), 'ss:Type' => 'String'
     end
   end
-  if dimension > 0
+  if dimension.positive?
     xml.Cell('ss:StyleID' => 'Outer',
              'ss:Index' => dimension.to_s) do
       xml.Data value_label(dimension - 1, result[:value]),

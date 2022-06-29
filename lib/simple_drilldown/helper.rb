@@ -24,7 +24,7 @@ module SimpleDrilldown
     end
 
     def summary_row(result, parent_result = nil, dimension = 0, headers = [], new_row = true)
-      html = render(partial: '/drilldown/summary_row', locals: {
+      html = render(partial: '/simple_drilldown/summary_row', locals: {
                       result: result, parent_result: parent_result, new_row: new_row, dimension: dimension,
                       headers: headers, with_results: !result[:rows]
                     })
@@ -38,10 +38,10 @@ module SimpleDrilldown
           html << summary_row(r, result, dimension + 1, sub_headers, i.positive?)
         end
       elsif @search.list
-        html << render(partial: '/drilldown/record_list', locals: { result: result, dimension: dimension })
+        html << render(partial: '/simple_drilldown/record_list', locals: { result: result, dimension: dimension })
       end
       if dimension < @dimensions.size
-        html << render(partial: '/drilldown/summary_total_row',
+        html << render(partial: '/simple_drilldown/summary_total_row',
                        locals: {
                          result: result, parent_result: parent_result, headers: headers.dup, dimension: dimension
                        })
@@ -71,15 +71,15 @@ module SimpleDrilldown
           xml << excel_summary_row(r, result, dimension + 1, sub_headers)
         end
       else
-        xml << render(partial: '/drilldown/excel_summary_row',
+        xml << render(partial: '/simple_drilldown/excel_summary_row',
                       locals: { result: result, parent_result: parent_result, headers: headers.dup,
                                 dimension: dimension })
 
-        xml << render(partial: '/drilldown/excel_record_list', locals: { result: result }) if @search.list
+        xml << render(partial: '/simple_drilldown/excel_record_list', locals: { result: result }) if @search.list
       end
 
       if dimension < @dimensions.size
-        xml << render(partial: '/drilldown/excel_summary_total_row', locals: {
+        xml << render(partial: '/simple_drilldown/excel_summary_total_row', locals: {
                         result: result, headers: headers.dup, dimension: dimension
                       })
       end
