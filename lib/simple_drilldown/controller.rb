@@ -155,7 +155,7 @@ module SimpleDrilldown
           dimension_def = c_dimension_defs[field.to_s]
           result_sets = dimension_def[:queries].map do |query|
             includes = merge_includes(includes, query[:includes]) if query[:includes]
-            rows_query = c_target_class.unscoped.where(c_base_condition)
+            rows_query = c_target_class.unscoped.where(realized_where(c_base_condition))
                                        .select("#{query[:select]} AS value")
                                        .joins(make_join([], c_target_class.name.underscore.to_sym, includes))
                                        .order('value')
@@ -163,7 +163,7 @@ module SimpleDrilldown
             rows_query = rows_query.without_deleted if c_target_class.try :paranoid?
             rows_query = rows_query.where(filter_conditions) if filter_conditions
             if (where = query[:where])
-              where_mapped = where.map { |e| e.respond_to?(:call) ? e.call : e }
+              where_mapped = realized_where(where)
               rows_query = rows_query.where(where_mapped)
             end
             rows = rows_query.to_a
@@ -181,6 +181,15 @@ module SimpleDrilldown
           values.sort! if dimension_def[:queries].size > 1
           values.reverse! if dimension_def[:reverse]
           values
+        end
+      end
+
+      def realized_where(where)
+        case where
+        when Array
+          where.map { |e| e.respond_to?(:call) ? e.call : e }
+        else
+          where
         end
       end
 
@@ -393,7 +402,7 @@ module SimpleDrilldown
       group = nil if group.empty?
 
       joins = self.class.make_join([], c_target_class.name.underscore.to_sym, includes)
-      row_query = c_target_class.unscoped.where(c_base_condition).select(select)
+      row_query = c_target_class.unscoped.where(self.class.realized_where(c_base_condition)).select(select)
       row_query = row_query.where(conditions) if conditions
       rows = row_query.joins(joins).group(group).order(order).to_a
       if rows.empty?
@@ -598,7 +607,8 @@ module SimpleDrilldown
       end
       joins = self.class.make_join([], c_target_class.name.underscore.to_sym, list_includes)
       list_conditions = list_conditions(conditions, values)
-      base_query = c_target_class.unscoped.where(c_base_condition).joins(joins).order(c_list_order)
+      base_query = c_target_class.unscoped.where(self.class.realized_where(c_base_condition)).joins(joins)
+                                 .order(c_list_order)
       base_query = base_query.where(list_conditions) if list_conditions
       result[:records] = base_query.to_a
     end
