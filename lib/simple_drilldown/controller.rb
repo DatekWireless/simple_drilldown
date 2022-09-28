@@ -162,7 +162,10 @@ module SimpleDrilldown
                                        .group(:value)
             rows_query = rows_query.without_deleted if c_target_class.try :paranoid?
             rows_query = rows_query.where(filter_conditions) if filter_conditions
-            rows_query = rows_query.where(query[:where]) if query[:where]
+            if (where = query[:where])
+              where_mapped = where.map { |e| e.respond_to?(:call) ? e.call : e }
+              rows_query = rows_query.where(where_mapped)
+            end
             rows = rows_query.to_a
             filter_fields = search.filter[field.to_s]
             filter_fields&.each do |selected_value|
@@ -192,6 +195,13 @@ module SimpleDrilldown
             dimension_def = c_dimension_defs[field]
             raise "Unknown filter field: #{field.inspect}" if dimension_def.nil?
 
+            dimension_def[:queries].each do |query|
+              next unless (where = query[:where])
+
+              where_mapped = where.map { |e| e.respond_to?(:call) ? e.call : e }
+              condition_strings << where_mapped[0]
+              condition_values += where_mapped[1..]
+            end
             values = Array(values)
             if dimension_def[:interval]
               if values[0].present? && values[1].present?
