@@ -9,7 +9,7 @@
       @result[:rows].map do |r|
         {
           name: r[:value],
-          data: r[:rows].map { |r2| [r2[:value], r2[@search.select_value]] }
+          data: r[:rows].map { |r2| [@dimensions[1][:label_method] ? @dimensions[1][:label_method].call(r2[:value]) : r2[:value], r2[@search.select_value]] }
         }
       end
     when 3
