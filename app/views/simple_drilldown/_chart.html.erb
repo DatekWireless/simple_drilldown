@@ -88,13 +88,22 @@
     if (firstPoint) {
     label = chart.data.labels[firstPoint.index];
     console.log("Label: " + label);
-    new_location = decodeURI(window.location.toString());
-    new_location = new_location.replace(/#.*$/, '');
-    new_location = new_location.replace("&search[dimensions][]=<%= @dimensions[0][:url_param_name] %>", '');
-    new_location = new_location.replaceAll(/&search\[filter\]\[<%= @dimensions[0][:url_param_name] %>\]\[\]=[^&#]*/g, '');
-    new_location = new_location + '&search[filter][<%= @dimensions[0][:url_param_name] %>][]=' + label;
-    console.log(new_location);
-    window.location = new_location;
+    new_location = new URL(window.location.toString());
+    new_location.hash = '';
+    params = new_location.searchParams;
+    dimensions = params.getAll('search[dimensions][]');
+    if (dimensions) {
+    delete(dimensions[dimensions.indexOf('<%= @dimensions[0][:url_param_name] %>')]);
+    if (dimensions.length > 0) {
+    params.set('search[dimensions][]', dimensions);
+    } else {
+    params.delete('search[dimensions][]');
+    }
+    }
+    params.delete('search[filter][<%= @dimensions[0][:url_param_name] %>][]');
+    params.set('search[filter][<%= @dimensions[0][:url_param_name] %>][]', label);
+    new_location.searchParams = params;
+    window.location = new_location.href;
     }
     });
   <% end %>
