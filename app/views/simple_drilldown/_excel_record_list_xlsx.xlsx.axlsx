@@ -37,7 +37,7 @@ def excel_row(sheet, wrap, transaction:)
 
     row << value
   end
-  sheet.add_row row, style: wrap
+  sheet.add_row row # , style: wrap
 end
 
 sheet.add_row []
