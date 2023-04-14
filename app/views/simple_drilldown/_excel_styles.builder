@@ -31,7 +31,7 @@ xml.Styles do
     xml.NumberFormat 'ss:Format' => '0.000'
   end
   xml.Style 'ss:ID' => 'NoDecimalNumberFormat' do
-    xml.NumberFormat 'ss:Format' => "\#,\#\#0"
+    xml.NumberFormat 'ss:Format' => '#,##0'
   end
   xml.Style 'ss:ID' => 'Percent' do
     xml.NumberFormat 'ss:Format' => '0%'
@@ -44,7 +44,7 @@ xml.Styles do
       xml.Border 'ss:Position' => 'Bottom', 'ss:Weight' => '1'
     end
     xml.Interior 'ss:Color' => '#dedede', 'ss:Pattern' => 'Solid'
-    xml.NumberFormat 'ss:Format' => "\#,\#\#0"
+    xml.NumberFormat 'ss:Format' => '#,##0'
   end
   xml.Style 'ss:ID' => 'Outer'
   xml.Style 'ss:ID' => 'ShortDate' do
