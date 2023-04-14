@@ -117,6 +117,9 @@ module SimpleDrilldown
           end
         end
 
+        pretty_name = I18n.t(:"simple_drilldown.dimension.#{name}",
+                             default: [:"simple_drilldown.#{name}", :"activerecord.models.#{name}", name.to_sym,
+                                       name.to_s.titleize])
         c_dimension_defs[name.to_s] = {
           includes: queries.inject(nil) do |a, e|
             i = e[:includes]
@@ -135,9 +138,7 @@ module SimpleDrilldown
           interval: interval,
           label_method: label_method,
           legal_values: legal_values,
-          pretty_name: I18n.t(:"simple_drilldown.dimension.#{name}",
-                              default: [:"simple_drilldown.#{name}", :"activerecord.models.#{name}", name.to_sym,
-                                        name.to_s.titleize]),
+          pretty_name: pretty_name,
           queries: queries,
           reverse: reverse,
           select_expression:
@@ -207,7 +208,7 @@ module SimpleDrilldown
             dimension_def[:queries].each do |query|
               next unless (where = query[:where])
 
-              where_mapped = where.map { |e| e.respond_to?(:call) ? e.call : e }
+              where_mapped = [*where].map { |e| e.respond_to?(:call) ? e.call : e }
               condition_strings << where_mapped[0]
               condition_values += where_mapped[1..]
             end
@@ -265,7 +266,12 @@ module SimpleDrilldown
           include.each do |parent, child|
             sql << " #{make_join(joins, model, parent)}"
             ass = model.to_s.camelize.constantize.reflect_on_association parent
-            sql << " #{make_join(joins, parent, child, ass.class_name.constantize)}"
+            sql << case ass.macro
+                   when :has_many
+                     " #{make_join(joins, ass.class_name.underscore, child, ass.class_name.constantize)}"
+                   else
+                     " #{make_join(joins, parent, child, ass.class_name.constantize)}"
+                   end
           end
           sql
         when Symbol
@@ -634,6 +640,21 @@ module SimpleDrilldown
         instance_eval(&scope)
       end
 
+      # def merge(scope)
+      #   @merged_scope = scope
+      #   self
+      # end
+      #
+      # def includes(includes)
+      #   @includes = includes
+      #   self
+      # end
+      #
+      # def references(references)
+      #   @references = references
+      #   self
+      # end
+      #
       def order(order)
         @order = order
         self
