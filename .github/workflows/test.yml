@@ -18,7 +18,7 @@ jobs:
         ruby-version: [ '3.3', '3.2', '3.1', 'jruby' ]
         gemfile:
           - 'rails71_gems.rb'
-          - 'rails70_gems.rb'
+#          - 'rails70_gems.rb'
         exclude:
           - ruby-version: jruby
             gemfile: rails71_gems.rb

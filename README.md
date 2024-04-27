@@ -1,8 +1,4 @@
-# SimpleDrilldown
-
-<a href="https://travis-ci.org/DatekWireless/simple_drilldown">
-<img align="right" src="https://travis-ci.org/DatekWireless/simple_drilldown.svg?branch=master" alt="Build Status">
-</a>
+# SimpleDrilldown [![Test](https://github.com/DatekWireless/simple_drilldown/actions/workflows/test.yml/badge.svg)](https://github.com/DatekWireless/simple_drilldown/actions/workflows/test.yml)
 
 `simple_drilldown` offers a simple way to define axis to filter and group records
 for analysis.  The result is a record count for the selected filter and

@@ -87,7 +87,8 @@
     firstPoint = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, false)[0]
     if (firstPoint) {
     label = chart.data.labels[firstPoint.index];
-    console.log("Label: " + label);
+    const values = <%== @result[:rows].map { |r| r[:value] }.to_json %>;
+    value = values[firstPoint.index];
     new_location = new URL(window.location.toString());
     new_location.hash = '';
     params = new_location.searchParams;
@@ -101,7 +102,7 @@
     }
     }
     params.delete('search[filter][<%= @dimensions[0][:url_param_name] %>][]');
-    params.set('search[filter][<%= @dimensions[0][:url_param_name] %>][]', label);
+    params.set('search[filter][<%= @dimensions[0][:url_param_name] %>][]', value);
     new_location.searchParams = params;
     window.location = new_location.href;
     }
