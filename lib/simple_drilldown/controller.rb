@@ -105,7 +105,7 @@ module SimpleDrilldown
           conditions = options.delete(:where)
           queries = [{
             select: select_expression,
-            includes: includes,
+            includes:,
             where: conditions
           }]
         end
@@ -135,15 +135,15 @@ module SimpleDrilldown
               a.concat(*i)
             end
           end,
-          interval: interval,
-          label_method: label_method,
-          legal_values: legal_values,
-          pretty_name: pretty_name,
-          queries: queries,
-          reverse: reverse,
+          interval:,
+          label_method:,
+          legal_values:,
+          pretty_name:,
+          queries:,
+          reverse:,
           select_expression:
             queries.size == 1 ? queries[0][:select] : "COALESCE(#{queries.map { |q| q[:select] }.join(',')})",
-          row_class: row_class,
+          row_class:,
           url_param_name: name.to_s
         }
       end

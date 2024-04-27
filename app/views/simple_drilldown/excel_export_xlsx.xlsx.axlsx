@@ -21,19 +21,19 @@ def excel_summary_row_xlsx(sheet, result, parent_result = nil, dimension = 0, he
     end
   else
     render(partial: '/simple_drilldown/excel_summary_row_xlsx',
-           locals: { sheet: sheet, result: result, parent_result: parent_result, headers: headers.dup,
-                     dimension: dimension })
+           locals: { sheet:, result:, parent_result:, headers: headers.dup,
+                     dimension: })
 
     if @search.list
       render(partial: '/simple_drilldown/excel_record_list_xlsx',
-             locals: { sheet: sheet, result: result })
+             locals: { sheet:, result: })
     end
   end
 
   return if dimension >= @dimensions.size
 
   render(partial: '/simple_drilldown/excel_summary_total_row_xlsx', locals: {
-           sheet: sheet, result: result, headers: headers.dup, dimension: dimension
+           sheet:, result:, headers: headers.dup, dimension:
          })
 end
 

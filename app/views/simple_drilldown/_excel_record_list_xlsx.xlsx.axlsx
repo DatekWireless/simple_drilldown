@@ -9,7 +9,7 @@ def excel_header_row(sheet)
   sheet.add_row row
 end
 
-def excel_row(sheet, wrap, transaction:)
+def excel_row(sheet, _wrap, transaction:)
   padding_cells = @dimensions.empty? ? 1 : @dimensions.size
   row = (1..(padding_cells - 1)).map { |_n| nil }
 

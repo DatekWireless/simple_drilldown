@@ -51,7 +51,7 @@ module SimpleDrilldown
         @dimensions.delete_if(&:empty?)
         @filter = attributes && attributes[:filter] ? attributes[:filter] : {}
         @filter.keys.dup.each { |k| @filter[k] = Array(@filter[k]) }
-        @filter.each do |_k, v|
+        @filter.each_value do |v|
           v.delete('')
           v.delete('Select Some Options')
         end
@@ -80,13 +80,13 @@ module SimpleDrilldown
     def url_options
       o = {
         search: {
-          title: title,
+          title:,
           list: list ? '1' : '0',
           percent: percent ? '1' : '0',
           list_change_times: list_change_times ? '1' : '0',
-          filter: filter,
-          dimensions: dimensions,
-          display_type: display_type
+          filter:,
+          dimensions:,
+          display_type:
         }
       }
       o[:search][:fields] = fields unless fields == @default_fields

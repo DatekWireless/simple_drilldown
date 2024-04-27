@@ -2,7 +2,7 @@
 
 xml.chart(
   xAxisName: (@dimensions[0][:pretty_name] || 'Elections').gsub("'", ''), palette: '2',
-  caption: caption, subcaption: subcaption,
+  caption:, subcaption:,
   showNames: '1',
   showValues: @result[:rows].size > 15 || (@result[:rows][0] && @result[:rows][0][:rows].size > 4) ? 0 : 1,
   decimals: '0',
