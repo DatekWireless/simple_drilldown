@@ -29,5 +29,4 @@ group :test do
   gem 'rubocop'
   gem 'selenium-webdriver'
   gem 'sprockets-rails'
-  gem 'webdrivers'
 end
