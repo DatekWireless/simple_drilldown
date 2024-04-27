@@ -28,5 +28,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'caxlsx_rails', '~>0.6'
   spec.add_dependency 'chartkick', '~>4.0'
-  spec.add_dependency 'rails', '>=6.1', '<8'
+  spec.add_dependency 'rails', '>=7.0', '<8'
 end
