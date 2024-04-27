@@ -16,7 +16,7 @@ gemspec path: __dir__
 # gem 'byebug', group: [:development, :test]
 
 group :development, :test do
-  gem 'activerecord-jdbcsqlite3-adapter', '>=71', platform: :jruby
+  gem 'activerecord-jdbcsqlite3-adapter', '>=70', platform: :jruby
   gem 'rubocop-capybara', require: false
   gem 'sqlite3', '<2', platform: :ruby
 end
