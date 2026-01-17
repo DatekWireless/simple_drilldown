@@ -292,7 +292,7 @@ module SimpleDrilldown
             "LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.#{pk_col} = #{model_table}.#{fk_col}"
           when :has_one, :has_many
             fk_col = ass.options[:foreign_key] || "#{model}_id"
-            sql = +"LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.#{fk_col} = #{model_table}.id"
+            sql = "LEFT JOIN #{include_table} #{include_alias} ON #{include_alias}.#{fk_col} = #{model_table}.id"
             sql << " AND #{include_alias}.deleted_at IS NULL" if ass.klass.paranoid?
             if ass.scope && (base_ass_order = ScopeHolder.new(ass.scope).to_s)
               /^(?<ass_order>.*?)(?<ass_order_desc>\s+DESC)?$/i =~ base_ass_order
@@ -321,8 +321,8 @@ module SimpleDrilldown
         end
       end
 
-      def merge_includes(*args)
-        hash = hash_includes(*args)
+      def merge_includes(*)
+        hash = hash_includes(*)
         result = hash.dup.map do |k, v|
           if v.blank?
             hash.delete(k)
@@ -368,7 +368,7 @@ module SimpleDrilldown
     end
 
     def initialize
-      super()
+      super
       @history_fields = c_fields.select { |_k, v| v[:list_change_times] }.map { |k, _v| k.to_s }
     end
 
@@ -427,7 +427,7 @@ module SimpleDrilldown
       @remaining_dimensions = c_dimension_defs.dup
       @remaining_dimensions.each_key do |dim_name|
         if (@search.filter[dim_name] && @search.filter[dim_name].size == 1) ||
-           (@dimensions.any? { |d| d[:url_param_name] == dim_name })
+           @dimensions.any? { |d| d[:url_param_name] == dim_name }
           @remaining_dimensions.delete(dim_name)
         end
       end

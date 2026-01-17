@@ -25,8 +25,7 @@ def excel_row(sheet, _wrap, transaction:)
 
     field_def = controller.c_fields[field.to_sym]
     if @search.list_change_times && field_def[:list_change_times] && transaction.assignment.try(:order)
-      changes = transaction.assignment.order.send("#{field}_changes")
-                           .map do |al|
+      changes = transaction.assignment.order.send("#{field}_changes").map do |al|
         [al.created_at.localtime.strftime('%H:%M'),
          PacMan.yaml_load(al.new_values).symbolize_keys[field.to_sym]]
       end

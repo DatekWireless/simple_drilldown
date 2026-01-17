@@ -3,4 +3,4 @@
 gems = File.expand_path('../Gemfile', __dir__)
 eval File.read(gems), binding, gems # rubocop: disable Security/Eval
 
-gem 'rails', '~> 7.1.0'
+gem 'rails', '~> 7.2.0'

@@ -15,13 +15,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ruby-version: [ '3.3', '3.2', '3.1', 'jruby' ]
+        ruby-version: [ '3.4', '3.3', 'jruby' ]
         gemfile:
-          - 'rails71_gems.rb'
-#          - 'rails70_gems.rb'
+          - 'rails72_gems.rb'
+          - 'rails80_gems.rb'
         exclude:
           - ruby-version: jruby
-            gemfile: rails71_gems.rb
+            gemfile: rails72_gems.rb
+          - ruby-version: jruby
+            gemfile: rails80_gems.rb
     env:
       BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}
 

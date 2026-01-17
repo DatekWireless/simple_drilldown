@@ -18,11 +18,12 @@ gemspec path: __dir__
 group :development, :test do
   gem 'activerecord-jdbcsqlite3-adapter', '>=70', platform: :jruby
   gem 'rubocop-capybara', require: false
-  gem 'sqlite3', '<2', platform: :ruby
+  gem 'sqlite3', '~>2.9', platform: :ruby
 end
 
 group :test do
   gem 'capybara'
+  gem 'minitest', '~> 5.0'
   gem 'net-smtp'
   gem 'paranoia'
   gem 'puma'

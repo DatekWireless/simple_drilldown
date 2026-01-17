@@ -1,10 +1,9 @@
 inherit_from: .rubocop_todo.yml
-require:
+plugins:
   - rubocop-capybara
 
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.1
 
 Style/Documentation:
   Enabled: false
