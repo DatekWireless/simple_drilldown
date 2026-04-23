@@ -27,6 +27,6 @@ Gem::Specification.new do |spec|
   spec.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
   spec.add_dependency 'caxlsx_rails', '~>0.6'
-  spec.add_dependency 'chartkick', '~>4.0'
+  spec.add_dependency 'chartkick', '~>5.0'
   spec.add_dependency 'rails', '>=7.2'
 end
